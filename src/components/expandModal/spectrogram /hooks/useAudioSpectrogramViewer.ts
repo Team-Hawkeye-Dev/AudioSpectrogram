@@ -19,28 +19,28 @@ export interface InitialView {
   scrollTime: number;
 }
 
-interface UseSpectrogramViewerProps {
-  containerRef: RefObject<HTMLDivElement | null>;
-  waveSurferRef: RefObject<WaveSurfer | null>;
+interface UseAudioSpectrogramViewerProps {
+  spectrogramContainerRef: RefObject<HTMLDivElement | null>;
+  waveSurferInstanceRef: RefObject<WaveSurfer | null>;
   initialViewRef: RefObject<InitialView | null>;
   audioDuration: number;
   isReadyAudio: boolean;
   applyZoomView: (view: InitialView, keepAutoScroll: boolean) => void;
 }
 
-export const useSpectrogramViewer = (audioUrl: string, maxFrequencyHz: number): UseSpectrogramViewerProps => {
+export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: number): UseAudioSpectrogramViewerProps => {
   const theme = useTheme();
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const waveSurferRef = useRef<WaveSurfer | null>(null);
+  const spectrogramContainerRef = useRef<HTMLDivElement | null>(null);
+  const waveSurferInstanceRef = useRef<WaveSurfer | null>(null);
   const initialViewRef = useRef<InitialView | null>(null);
 
   const [audioDuration, setAudioDuration] = useState(0);
   const [isReadyAudio, setIsReadyAudio] = useState(false);
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    
-    const containerWidth = containerRef.current.clientWidth;
+    if (!spectrogramContainerRef.current) return;
+
+    const containerWidth = spectrogramContainerRef.current.clientWidth;
     const initialPxPerSec = containerWidth / VISIBLE_WINDOW_SECONDS;
     initialViewRef.current = { minPxPerSec: initialPxPerSec, scrollTime: 0 };
 
@@ -68,7 +68,7 @@ export const useSpectrogramViewer = (audioUrl: string, maxFrequencyHz: number): 
     });
 
     const waveSurfer = WaveSurfer.create({
-      container: containerRef.current,
+      container: spectrogramContainerRef.current,
       url: audioUrl,
       sampleRate: DECODE_SAMPLE_RATE_HZ,
       height: 0,
@@ -81,7 +81,7 @@ export const useSpectrogramViewer = (audioUrl: string, maxFrequencyHz: number): 
       plugins: [spectrogramPlugin, timeLinePlugin],
     });
 
-    waveSurferRef.current = waveSurfer;
+    waveSurferInstanceRef.current = waveSurfer;
     waveSurfer.on('ready', (readyAudioDuration) => {
       setAudioDuration(readyAudioDuration);
       setIsReadyAudio(true);
@@ -89,14 +89,14 @@ export const useSpectrogramViewer = (audioUrl: string, maxFrequencyHz: number): 
 
     return () => {
       waveSurfer.destroy();
-      waveSurferRef.current = null;
+      waveSurferInstanceRef.current = null;
       setIsReadyAudio(false);
       setAudioDuration(0);
     };
   }, [audioUrl, maxFrequencyHz, theme]);
 
   const applyZoomView = useCallback((view: InitialView, keepAutoScroll: boolean) => {
-    const waveSurfer = waveSurferRef.current;
+    const waveSurfer = waveSurferInstanceRef.current;
     if (!waveSurfer) {
       return;
     }
@@ -108,8 +108,8 @@ export const useSpectrogramViewer = (audioUrl: string, maxFrequencyHz: number): 
   }, []);
 
   return {
-    containerRef,
-    waveSurferRef,
+    spectrogramContainerRef,
+    waveSurferInstanceRef,
     initialViewRef,
     audioDuration,
     isReadyAudio,

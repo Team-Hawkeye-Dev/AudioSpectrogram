@@ -5,7 +5,7 @@ import {
   SPECTROGRAM_FREQUENCY_CONFIG,
   type SpectrogramType,
 } from "../../consts/spectrogram.consts";
-import { useSpectrogramViewer } from "../../hooks/useSpectrgoramViewer";
+import { useAudioSpectrogramViewer } from "../../hooks/useAudioSpectrogramViewer";
 import { useZoomSelection } from "../../hooks/useZoomSelection";
 import {
   FrequencyLabel,
@@ -30,18 +30,18 @@ export const SpectrogramViewer = ({
   const { maxHz, stepHz } = SPECTROGRAM_FREQUENCY_CONFIG[spectrogramPlotType];
 
   const {
-    containerRef,
-    waveSurferRef,
+    spectrogramContainerRef,
+    waveSurferInstanceRef,
     initialViewRef,
     audioDuration,
     isReadyAudio,
     applyZoomView,
-  } = useSpectrogramViewer(audioUrl, maxHz);
+  } = useAudioSpectrogramViewer(audioUrl, maxHz);
 
   const { selection, onDragStart, onDragMove, onDragEnd, resetZoom } =
     useZoomSelection({
-      containerRef,
-      waveSurferRef,
+      spectrogramContainerRef,
+      waveSurferInstanceRef,
       initialViewRef,
       audioDuration,
       isReadyAudio,
@@ -66,7 +66,7 @@ export const SpectrogramViewer = ({
             })}
           </FrequencyLabelList>
           <WavePlotWrapper
-            ref={containerRef}
+            ref={spectrogramContainerRef}
             onPointerDown={onDragStart}
             onPointerMove={onDragMove}
             onPointerUp={onDragEnd}

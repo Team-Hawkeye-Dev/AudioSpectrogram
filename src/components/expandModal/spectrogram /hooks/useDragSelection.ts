@@ -9,8 +9,8 @@ interface Selection {
 }
 
 interface UseDragSelectionProps {
-    containerRef: RefObject<HTMLDivElement | null> 
-    waveSurferRef: RefObject<WaveSurfer | null> 
+    spectrogramContainerRef: RefObject<HTMLDivElement | null>
+    waveSurferInstanceRef: RefObject<WaveSurfer | null>
     audioDuration: number
     isReadyAudio: boolean
     onZoomIn: (minPxPerSec: number, scrollTime: number) => void
@@ -20,7 +20,7 @@ interface UseDragSelectionProps {
 const LEFT_MOUSE_CLICK = 0
 
 export const useDragSelection = ({
-containerRef, waveSurferRef, audioDuration,  isReadyAudio, onZoomIn, onZoomOut
+spectrogramContainerRef, waveSurferInstanceRef, audioDuration,  isReadyAudio, onZoomIn, onZoomOut
 }: UseDragSelectionProps) => {
     const [selection, setSelection] = useState<Selection | null>(null)
     const startPxRef = useRef<number | null>(null)
@@ -61,7 +61,7 @@ containerRef, waveSurferRef, audioDuration,  isReadyAudio, onZoomIn, onZoomOut
     }
 
     const onDragEnd = (event: PointerEvent<HTMLDivElement>) => {
-       const waveSurfer = waveSurferRef.current
+       const waveSurfer = waveSurferInstanceRef.current
        const startPx = startPxRef.current
        startPxRef.current = null
        setSelection(null)
@@ -70,13 +70,12 @@ containerRef, waveSurferRef, audioDuration,  isReadyAudio, onZoomIn, onZoomOut
 
        const endPx = event.clientX - getRect(event.currentTarget).left
        const dragPx = endPx - startPx
-       const width = containerRef.current?.clientWidth ?? 0
+       const width = spectrogramContainerRef.current?.clientWidth ?? 0
 
        if (dragPx < 0) {
         zoomOutFromLeftDrag(waveSurfer, width)
         return
        }
-
        zoomInToRightDragSelection(waveSurfer, width, startPx, endPx)
     }
 

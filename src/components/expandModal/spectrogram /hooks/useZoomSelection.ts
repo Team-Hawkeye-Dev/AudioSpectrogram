@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useRef } from 'react';
 import type { RefObject } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
-import type { InitialView } from './useSpectrgoramViewer';
+import type { InitialView } from './useAudioSpectrogramViewer';
 import { useDragSelection } from './useDragSelection';
 import { useWheelScroll } from './useWheelScroll';
 
 interface UseZoomSelectionProps {
-  containerRef: RefObject<HTMLDivElement | null>;
-  waveSurferRef: RefObject<WaveSurfer | null>;
+  spectrogramContainerRef: RefObject<HTMLDivElement | null>;
+  waveSurferInstanceRef: RefObject<WaveSurfer | null>;
   initialViewRef: RefObject<InitialView | null>;
   audioDuration: number;
   isReadyAudio: boolean;
@@ -15,35 +15,35 @@ interface UseZoomSelectionProps {
 }
 
 export const useZoomSelection = ({
-  containerRef,
-  waveSurferRef,
+  spectrogramContainerRef,
+  waveSurferInstanceRef,
   initialViewRef,
   audioDuration,
   isReadyAudio,
   applyZoomView,
 }: UseZoomSelectionProps) => {
-  const waveSurfer = waveSurferRef.current;
-  const container = containerRef.current;
+  const waveSurfer = waveSurferInstanceRef.current;
+  const container = spectrogramContainerRef.current;
   const initialView = initialViewRef.current;
   const applyZoomViewRef = useRef(applyZoomView);
   applyZoomViewRef.current = applyZoomView;
 
   useWheelScroll({
-    containerRef,
-    waveSurferRef,
+    spectrogramContainerRef,
+    waveSurferInstanceRef,
     audioDuration,
     isReadyAudio,
   });
 
   const minZoom = useMemo(() => {
     if (!initialView || !container) return initialView?.minPxPerSec ?? 0;
-    
+
     return Math.max(initialView.minPxPerSec, container.clientWidth / audioDuration);
   }, [audioDuration, container, initialView]);
 
   const { selection, onDragStart, onDragMove, onDragEnd } = useDragSelection({
-    containerRef,
-    waveSurferRef,
+    spectrogramContainerRef,
+    waveSurferInstanceRef,
     audioDuration,
     isReadyAudio,
     onZoomIn: (minPxPerSec, scrollTime) => {

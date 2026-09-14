@@ -3,20 +3,20 @@ import type WaveSurfer from 'wavesurfer.js';
 import { TIME_AXIS_INTERVAL_SECONDS } from '../consts/spectrogram.consts';
 
 interface UseWheelScrollProps {
-  containerRef: RefObject<HTMLDivElement | null>;
-  waveSurferRef: RefObject<WaveSurfer | null>;
+  spectrogramContainerRef: RefObject<HTMLDivElement | null>;
+  waveSurferInstanceRef: RefObject<WaveSurfer | null>;
   audioDuration: number;
   isReadyAudio: boolean;
 }
 
 export const useWheelScroll = ({
-  containerRef,
-  waveSurferRef,
+  spectrogramContainerRef,
+  waveSurferInstanceRef,
   audioDuration,
   isReadyAudio,
 }: UseWheelScrollProps) => {
   useEffect(() => {
-    const container = containerRef.current;
+    const container = spectrogramContainerRef.current;
     if (!isReadyAudio || !container) {
       return;
     }
@@ -24,7 +24,7 @@ export const useWheelScroll = ({
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
 
-      const waveSurfer = waveSurferRef.current;
+      const waveSurfer = waveSurferInstanceRef.current;
       if (!waveSurfer) {
         return;
       }
@@ -49,5 +49,5 @@ export const useWheelScroll = ({
     return () => {
       container.removeEventListener('wheel', handleWheel, { capture: true });
     };
-  }, [audioDuration, containerRef, isReadyAudio, waveSurferRef]);
+  }, [audioDuration, spectrogramContainerRef, isReadyAudio, waveSurferInstanceRef]);
 };
