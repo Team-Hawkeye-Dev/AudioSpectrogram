@@ -4,15 +4,10 @@ export const SpectrogramViewerRootContainer = styled(Box)({
     display: 'flex',
     flexDirection: "column",
     flex: 1,
-    minHeight: 0,
     overflow: 'hidden'
 })
 
 export const SpectrgoramRowContainer = styled(Box)(({theme}) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    flex: 1,
-    minHeight: 0,
     borderRadius: theme.shape.borderRadius,
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(1)
@@ -21,7 +16,6 @@ export const SpectrgoramRowContainer = styled(Box)(({theme}) => ({
 export const SpectrogramPlotRow = styled(Box)({
     display: 'flex',
     flex: 1,
-    minHeight: 0
 })
 
 export const WavePlotWrapper = styled(Box)(({theme}) => ({
@@ -56,7 +50,7 @@ export const FrequencyLabelList = styled(Box)(({theme}) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    height: '100%',
+    height: '33vh',
     padding: theme.spacing(0.5, 1, 0.5, 0)
 }))
 
