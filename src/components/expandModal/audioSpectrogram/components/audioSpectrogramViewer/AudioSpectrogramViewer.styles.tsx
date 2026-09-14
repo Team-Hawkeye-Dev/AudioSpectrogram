@@ -1,5 +1,5 @@
 import { alpha, Box, styled, Typography } from "@mui/material";
-import { SPECTROGRAM_HEIGHT_PX } from "../../consts/spectrogram.consts";
+import { SPECTROGRAM_HEIGHT_PX } from "../../consts/audioSpectrogram.consts";
 
 export const SpectrogramViewerRootContainer = styled(Box)({
     display: 'flex', 

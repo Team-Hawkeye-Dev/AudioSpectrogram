@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import type { AudioSpectrogramViewerProps } from '../types/spectrogram.types';
+import type { AudioSpectrogramViewerProps } from '../types/audioSpectrogram.types';
 import { useDragSelection } from './useDragSelection';
 import { useWheelScroll } from './useWheelScroll';
 

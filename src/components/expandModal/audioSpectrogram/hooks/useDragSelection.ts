@@ -1,8 +1,8 @@
 import { useState, useRef, type PointerEvent } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
-import { CONTAINER_CENTER_RATIO, DRAG_ZOOM_OUT_FACTOR, VISIBLE_WINDOW_SECONDS } from '../consts/spectrogram.consts';
+import { CONTAINER_CENTER_RATIO, DRAG_ZOOM_OUT_FACTOR, VISIBLE_WINDOW_SECONDS } from '../consts/audioSpectrogram.consts';
 import { pixelToTimeInSeconds } from '../utils/pixelToTime';
-import type { SpectrogramInteractionContext } from '../types/spectrogram.types';
+import type { SpectrogramInteractionContext } from '../types/audioSpectrogram.types';
 
 interface Selection {
     startPx: number

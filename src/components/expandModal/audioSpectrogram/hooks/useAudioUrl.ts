@@ -1,6 +1,6 @@
 import topAudioUrl from "/home/c885423@CASA.NET/Downloads/file_example_WAV_1MG.wav?url";
 import bottomAudioUrl from "/home/c885423@CASA.NET/Downloads/file_example_WAV_10MG.wav?url";
-import { SpectrogramType } from "../consts/spectrogram.consts";
+import { SpectrogramType } from "../consts/audioSpectrogram.consts";
 
 const audioUrls = {
   [SpectrogramType.TOP]: topAudioUrl,

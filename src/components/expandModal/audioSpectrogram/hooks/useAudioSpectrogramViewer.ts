@@ -11,9 +11,9 @@ import {
   TIME_AXIS_HEIGHT_PX,
   TIME_AXIS_INTERVAL_SECONDS,
   VISIBLE_WINDOW_SECONDS,
-} from '../consts/spectrogram.consts';
+} from '../consts/audioSpectrogram.consts';
 import { formatXAxisTimestamp } from '../utils/formatXaxisTimestamp';
-import type { AudioSpectrogramViewerProps, InitialView } from '../types/spectrogram.types';
+import type { AudioSpectrogramViewerProps, InitialView } from '../types/audioSpectrogram.types';
 
 export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: number): AudioSpectrogramViewerProps => {
   const theme = useTheme();

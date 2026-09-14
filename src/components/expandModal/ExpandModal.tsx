@@ -5,7 +5,7 @@ import {
   StyledModal,
   StyledModalContentContainer,
 } from "./ExpandModal.styles";
-import { Spectrogram } from "./spectrogram /Spectrogram";
+import { AudioSpectrogram } from "./audioSpectrogram/AudioSpectrogram";
 
 export const ExpandModal = () => {
   return (
@@ -15,7 +15,7 @@ export const ExpandModal = () => {
           <CloseIcon fontSize="medium" />
         </CloseButtonWrapper>
         <SpectrogramContainer>
-          <Spectrogram />
+          <AudioSpectrogram />
         </SpectrogramContainer>
       </StyledModalContentContainer>
     </StyledModal>

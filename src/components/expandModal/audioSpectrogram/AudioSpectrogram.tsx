@@ -1,10 +1,10 @@
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
-import { SpectrogramViewer } from "./components/spectrogramViewer/SpectrogramViewer";
-import { SpectrogramType } from "./consts/spectrogram.consts";
+import { AudioSpectrogramViewer } from "./components/audioSpectrogramViewer/AudioSpectrogramViewer";
+import { SpectrogramType } from "./consts/audioSpectrogram.consts";
 import { useAudioUrl } from "./hooks/useAudioUrl";
-import { ExpandModalContainer, SpectrogramTitle } from "./Spectrogram.styles";
+import { ExpandModalContainer, SpectrogramTitle } from "./AudioSpectrogram.styles";
 
-export const Spectrogram = () => {
+export const AudioSpectrogram = () => {
   const topUrl = useAudioUrl();
   const bottomUrl = useAudioUrl();
 
@@ -15,13 +15,13 @@ export const Spectrogram = () => {
         Spectrogram (switch icon)
       </SpectrogramTitle>
       {topUrl && (
-        <SpectrogramViewer
+        <AudioSpectrogramViewer
           audioUrl={topUrl}
           spectrogramPlotType={SpectrogramType.TOP}
         />
       )}
       {bottomUrl && (
-        <SpectrogramViewer
+        <AudioSpectrogramViewer
           audioUrl={bottomUrl}
           spectrogramPlotType={SpectrogramType.BOTTOM}
         />

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { TIME_AXIS_INTERVAL_SECONDS } from '../consts/spectrogram.consts';
-import type { SpectrogramInteractionContext } from '../types/spectrogram.types';
+import { TIME_AXIS_INTERVAL_SECONDS } from '../consts/audioSpectrogram.consts';
+import type { SpectrogramInteractionContext } from '../types/audioSpectrogram.types';
 
 export const useWheelScroll = ({
   spectrogramContainerRef,

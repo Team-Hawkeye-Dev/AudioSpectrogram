@@ -4,7 +4,7 @@ import {
   FREQUENCY_STEP,
   SPECTROGRAM_FREQUENCY_CONFIG,
   type SpectrogramType,
-} from "../../consts/spectrogram.consts";
+} from "../../consts/audioSpectrogram.consts";
 import { useAudioSpectrogramViewer } from "../../hooks/useAudioSpectrogramViewer";
 import { useZoomSelection } from "../../hooks/useZoomSelection";
 import {
@@ -16,14 +16,14 @@ import {
   SpectrogramViewerRootContainer,
   SelectionHightlight,
   WavePlotWrapper,
-} from "./SpectrogramViewer.styles";
+} from "./AudioSpectrogramViewer.styles";
 
 interface SpectrogramViewerProps {
   audioUrl: string;
   spectrogramPlotType: SpectrogramType;
 }
 
-export const SpectrogramViewer = ({
+export const AudioSpectrogramViewer = ({
   audioUrl,
   spectrogramPlotType,
 }: SpectrogramViewerProps) => {
