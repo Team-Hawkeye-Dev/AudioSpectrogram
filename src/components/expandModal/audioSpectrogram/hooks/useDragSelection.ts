@@ -1,4 +1,4 @@
-import { useState, useRef, type PointerEvent } from 'react';
+import { useCallback, useState, useRef, type PointerEvent } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 import { CONTAINER_CENTER_RATIO, DRAG_ZOOM_OUT_FACTOR, VISIBLE_WINDOW_SECONDS } from '../consts/audioSpectrogram.consts';
 import type { SpectrogramInteractionContext } from '../types/audioSpectrogram.types';
@@ -6,14 +6,6 @@ import type { SpectrogramInteractionContext } from '../types/audioSpectrogram.ty
 interface Selection {
     startPx: number
     currentPx: number
-}
-
-// WaveSurfer has no built-in pixel-to-time conversion. viewportPixelX is relative
-// to the visible (scrolled) viewport, so add the scroll offset to place it on the
-// full waveform, then divide by the zoom scale (pixels per second) to get seconds.
-const pixelToTimeInSeconds = (waveSurfer: WaveSurfer, viewportPixelX: number): number => {
-    const absolutePixelX = waveSurfer.getScroll() + viewportPixelX
-    return absolutePixelX / waveSurfer.options.minPxPerSec
 }
 
 interface UseDragSelectionProps extends SpectrogramInteractionContext {
@@ -30,6 +22,14 @@ spectrogramContainerRef, waveSurferInstanceRef, audioDuration,  isReadyAudio, on
     const startPxRef = useRef<number | null>(null)
 
     const getRect = (target: HTMLElement) => target.getBoundingClientRect()
+
+    // WaveSurfer has no built-in pixel-to-time conversion. viewportPixelX is relative
+    // to the visible (scrolled) viewport, so add the scroll offset to place it on the
+    // full waveform, then divide by the zoom scale (pixels per second) to get seconds.
+    const pixelToTimeInSeconds = useCallback((waveSurfer: WaveSurfer, viewportPixelX: number): number => {
+        const absolutePixelX = waveSurfer.getScroll() + viewportPixelX
+        return absolutePixelX / waveSurfer.options.minPxPerSec
+    }, [])
 
     const onDragStart = (event: PointerEvent<HTMLDivElement>) => {
         if (!isReadyAudio || event.button !== LEFT_MOUSE_CLICK) return
