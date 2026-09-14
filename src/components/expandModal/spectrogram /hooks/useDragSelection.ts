@@ -1,6 +1,6 @@
 import { useRef, useState, type PointerEvent, type RefObject } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
-import { VISIBLE_WINDOW_SECONDS } from '../consts/spectrogram.consts';
+import { CONTAINER_CENTER_RATIO, DRAG_ZOOM_OUT_FACTOR, VISIBLE_WINDOW_SECONDS } from '../consts/spectrogram.consts';
 import { pixelToTimeInSeconds } from '../utils/pixelToTime';
 
 interface Selection {
@@ -41,6 +41,25 @@ containerRef, waveSurferRef, audioDuration,  isReadyAudio, onZoomIn, onZoomOut
         setSelection((prev) => prev ? {...prev, currentPx} : null)
     }
 
+    const zoomOutFromLeftDrag = (waveSurfer: WaveSurfer, width: number) => {
+        const minZoom = width / VISIBLE_WINDOW_SECONDS
+        const nextMinPxPerSec = Math.max(minZoom, waveSurfer.options.minPxPerSec / DRAG_ZOOM_OUT_FACTOR)
+        const visibleDuration = width / nextMinPxPerSec
+        const centerTime = pixelToTimeInSeconds(waveSurfer, width * CONTAINER_CENTER_RATIO)
+        const maxScroll = Math.max(0, audioDuration - visibleDuration)
+        const nextScroll = Math.min(maxScroll, Math.max(0, centerTime - visibleDuration * CONTAINER_CENTER_RATIO))
+        onZoomOut(nextMinPxPerSec, nextScroll)
+    }
+
+    const zoomInToRightDragSelection = (waveSurfer: WaveSurfer, width: number, startPx: number, endPx: number) => {
+        const startTime = pixelToTimeInSeconds(waveSurfer, Math.min(startPx, endPx))
+        const endTime = pixelToTimeInSeconds(waveSurfer, Math.max(startPx, endPx))
+        const selectedDuration = endTime - startTime
+        if (selectedDuration > 0) {
+            onZoomIn(width / selectedDuration, startTime)
+        }
+    }
+
     const onDragEnd = (event: PointerEvent<HTMLDivElement>) => {
        const waveSurfer = waveSurferRef.current
        const startPx = startPxRef.current
@@ -54,22 +73,11 @@ containerRef, waveSurferRef, audioDuration,  isReadyAudio, onZoomIn, onZoomOut
        const width = containerRef.current?.clientWidth ?? 0
 
        if (dragPx < 0) {
-        const minZoom = width / VISIBLE_WINDOW_SECONDS
-        const nextMinPxPerSec = Math.max(minZoom, waveSurfer.options.minPxPerSec / 2)
-        const visibleDuration = width / nextMinPxPerSec
-        const centerTime = pixelToTimeInSeconds(waveSurfer, width / 2)
-        const maxScroll = Math.max(0, audioDuration - visibleDuration)
-        const nextScroll = Math.min(maxScroll, Math.max(0, centerTime - visibleDuration / 2))
-        onZoomOut(nextMinPxPerSec, nextScroll)
-       } else {
-        //Drag right -> zoom in to selection
-        const startTime = pixelToTimeInSeconds(waveSurfer, Math.min(startPx, endPx))
-        const endTime = pixelToTimeInSeconds(waveSurfer, Math.max(startPx, endPx))
-        const selectedDuration = endTime - startTime
-        if (selectedDuration > 0) {
-            onZoomIn(width / selectedDuration, startTime)
-        }
+        zoomOutFromLeftDrag(waveSurfer, width)
+        return
        }
+
+       zoomInToRightDragSelection(waveSurfer, width, startPx, endPx)
     }
 
     return { selection, onDragStart, onDragMove, onDragEnd }

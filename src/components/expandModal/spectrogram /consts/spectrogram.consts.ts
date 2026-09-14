@@ -1,5 +1,8 @@
 export const VISIBLE_WINDOW_SECONDS = 90;
 
+export const DRAG_ZOOM_OUT_FACTOR = 2;
+export const CONTAINER_CENTER_RATIO = 0.5;
+
 export const TIME_AXIS_INTERVAL_SECONDS = 5;
 export const TIME_AXIS_HEIGHT_PX = 24;
 
