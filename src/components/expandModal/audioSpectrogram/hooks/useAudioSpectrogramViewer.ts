@@ -14,6 +14,7 @@ import {
   TIMESTAMP_SECONDS_PAD_CHAR,
   TIMESTAMP_SECONDS_PAD_LENGTH,
   VISIBLE_WINDOW_SECONDS,
+  ZOOM_DEBOUNCE_MS,
 } from '../consts/audioSpectrogram.consts';
 import type { AudioSpectrogramViewerProps, InitialView } from '../types/audioSpectrogram.types';
 import { onSpectrogramReady } from '../utils/spectrogramActions';
@@ -26,6 +27,8 @@ export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: numb
 
   const [audioDuration, setAudioDuration] = useState(0);
   const [isReadyAudio, setIsReadyAudio] = useState(false);
+
+  const zoomDebounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
      const container = spectrogramContainerRef.current;
@@ -76,19 +79,28 @@ export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: numb
       plugins: [spectrogramPlugin, timeLinePlugin],
     });
 
-    return onSpectrogramReady(waveSurferInstanceRef, waveSurfer, setAudioDuration, setIsReadyAudio);
+    const cleanupSpectrogram = onSpectrogramReady(waveSurferInstanceRef, waveSurfer, setAudioDuration, setIsReadyAudio);
+    return () => {
+      if (zoomDebounceTimeoutRef.current) {
+        clearTimeout(zoomDebounceTimeoutRef.current);
+      }
+      cleanupSpectrogram();
+    };
   }, [audioUrl, maxFrequencyHz, theme]);
 
   const applyZoomView = useCallback((view: InitialView, keepAutoScroll: boolean) => {
-    const waveSurfer = waveSurferInstanceRef.current;
-    if (!waveSurfer) {
-      return;
-    }
+    if (zoomDebounceTimeoutRef.current) clearTimeout(zoomDebounceTimeoutRef.current);
+    zoomDebounceTimeoutRef.current = setTimeout(() => {
+      const waveSurfer = waveSurferInstanceRef.current;
+      if (!waveSurfer) {
+        return;
+      }
 
-    const { minPxPerSec, scrollTime } = view;
-    waveSurfer.setOptions({ autoScroll: keepAutoScroll });
-    waveSurfer.zoom(minPxPerSec);
-    waveSurfer.setScrollTime(scrollTime);
+      const { minPxPerSec, scrollTime } = view;
+      waveSurfer.setOptions({ autoScroll: keepAutoScroll });
+      waveSurfer.zoom(minPxPerSec);
+      waveSurfer.setScrollTime(scrollTime);
+    }, ZOOM_DEBOUNCE_MS);
   }, []);
 
   return {

@@ -1,4 +1,5 @@
 export const VISIBLE_WINDOW_SECONDS = 90;
+export const ZOOM_DEBOUNCE_MS = 150;
 
 export const SECONDS_PER_MINUTE = 60;
 export const TIMESTAMP_SECONDS_PAD_LENGTH = 2;
