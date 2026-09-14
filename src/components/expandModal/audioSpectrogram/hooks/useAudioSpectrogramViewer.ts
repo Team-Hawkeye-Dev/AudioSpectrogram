@@ -6,13 +6,15 @@ import WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogram-wi
 import {
   DECODE_SAMPLE_RATE_HZ,
   FREQUENCY_MIN_HZ,
+  SECONDS_PER_MINUTE,
   SPECTROGRAM_FFT_SAMPLES,
   SPECTROGRAM_HEIGHT_PX,
   TIME_AXIS_HEIGHT_PX,
   TIME_AXIS_INTERVAL_SECONDS,
+  TIMESTAMP_SECONDS_PAD_CHAR,
+  TIMESTAMP_SECONDS_PAD_LENGTH,
   VISIBLE_WINDOW_SECONDS,
 } from '../consts/audioSpectrogram.consts';
-import { formatXAxisTimestamp } from '../utils/formatXaxisTimestamp';
 import type { AudioSpectrogramViewerProps, InitialView } from '../types/audioSpectrogram.types';
 import { onSpectrogramReady } from '../utils/spectrogramActions';
 
@@ -48,7 +50,11 @@ export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: numb
       height: TIME_AXIS_HEIGHT_PX,
       timeInterval: TIME_AXIS_INTERVAL_SECONDS,
       primaryLabelInterval: TIME_AXIS_INTERVAL_SECONDS,
-      formatTimeCallback: (seconds) => formatXAxisTimestamp(seconds),
+      formatTimeCallback: (seconds) => {
+        const mins = Math.floor(seconds / SECONDS_PER_MINUTE);
+        const secs = Math.floor(seconds % SECONDS_PER_MINUTE);
+        return `${mins}:${secs.toString().padStart(TIMESTAMP_SECONDS_PAD_LENGTH, TIMESTAMP_SECONDS_PAD_CHAR)}`;
+      },
       style: {
         fontSize: '12px',
         background: theme.palette.background.default,
