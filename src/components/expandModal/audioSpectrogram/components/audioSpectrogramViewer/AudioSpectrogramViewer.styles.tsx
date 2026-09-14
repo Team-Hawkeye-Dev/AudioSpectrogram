@@ -1,14 +1,18 @@
 import { alpha, Box, styled, Typography } from "@mui/material";
-import { SPECTROGRAM_HEIGHT_PX } from "../../consts/audioSpectrogram.consts";
 
 export const SpectrogramViewerRootContainer = styled(Box)({
-    display: 'flex', 
+    display: 'flex',
     flexDirection: "column",
     flex: 1,
+    minHeight: 0,
     overflow: 'hidden'
 })
 
 export const SpectrgoramRowContainer = styled(Box)(({theme}) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    minHeight: 0,
     borderRadius: theme.shape.borderRadius,
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(1)
@@ -16,7 +20,8 @@ export const SpectrgoramRowContainer = styled(Box)(({theme}) => ({
 
 export const SpectrogramPlotRow = styled(Box)({
     display: 'flex',
-    flex: 1
+    flex: 1,
+    minHeight: 0
 })
 
 export const WavePlotWrapper = styled(Box)(({theme}) => ({
@@ -51,7 +56,7 @@ export const FrequencyLabelList = styled(Box)(({theme}) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    height: SPECTROGRAM_HEIGHT_PX,
+    height: '100%',
     padding: theme.spacing(0.5, 1, 0.5, 0)
 }))
 

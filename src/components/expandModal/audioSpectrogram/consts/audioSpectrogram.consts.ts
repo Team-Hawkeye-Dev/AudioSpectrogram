@@ -11,7 +11,6 @@ export const CONTAINER_CENTER_RATIO = 0.5;
 export const TIME_AXIS_INTERVAL_SECONDS = 5;
 export const TIME_AXIS_HEIGHT_PX = 24;
 
-export const SPECTROGRAM_HEIGHT_PX = 350;
 export const SPECTROGRAM_FFT_SAMPLES = 512;
 export const FREQUENCY_MIN_HZ = 0;
 export const DECODE_SAMPLE_RATE_HZ = 16000;

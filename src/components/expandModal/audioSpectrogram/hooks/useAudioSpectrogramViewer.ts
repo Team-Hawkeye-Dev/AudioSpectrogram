@@ -8,7 +8,6 @@ import {
   FREQUENCY_MIN_HZ,
   SECONDS_PER_MINUTE,
   SPECTROGRAM_FFT_SAMPLES,
-  SPECTROGRAM_HEIGHT_PX,
   TIME_AXIS_HEIGHT_PX,
   TIME_AXIS_INTERVAL_SECONDS,
   TIMESTAMP_SECONDS_PAD_CHAR,
@@ -35,11 +34,12 @@ export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: numb
     if (!container) return;
 
     const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
     const initialPxPerSec = containerWidth / VISIBLE_WINDOW_SECONDS;
     initialViewRef.current = { minPxPerSec: initialPxPerSec, scrollTime: 0 };
 
     const spectrogramPlugin = WindowedSpectrogramPlugin.create({
-      height: SPECTROGRAM_HEIGHT_PX,
+      height: containerHeight,
       frequencyMin: FREQUENCY_MIN_HZ,
       frequencyMax: maxFrequencyHz,
       fftSamples: SPECTROGRAM_FFT_SAMPLES,

@@ -11,8 +11,8 @@ export const StyledModal = styled(Modal)(({ theme }) => ({
 
 export const StyledModalContentContainer = styled(Box)({
   display: "flex",
-  width: "100%",
-  height: "92vh",
+  width: "95vw",
+  height: "95vh",
 });
 
 export const SpectrogramContainer = styled(Box)(({ theme }) => ({
