@@ -14,6 +14,7 @@ import {
 } from '../consts/audioSpectrogram.consts';
 import { formatXAxisTimestamp } from '../utils/formatXaxisTimestamp';
 import type { AudioSpectrogramViewerProps, InitialView } from '../types/audioSpectrogram.types';
+import { onSpectrogramReady } from '../utils/spectrogramActions';
 
 export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: number): AudioSpectrogramViewerProps => {
   const theme = useTheme();
@@ -25,9 +26,10 @@ export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: numb
   const [isReadyAudio, setIsReadyAudio] = useState(false);
 
   useEffect(() => {
-    if (!spectrogramContainerRef.current) return;
+     const container = spectrogramContainerRef.current;
+    if (!container) return;
 
-    const containerWidth = spectrogramContainerRef.current.clientWidth;
+    const containerWidth = container.clientWidth;
     const initialPxPerSec = containerWidth / VISIBLE_WINDOW_SECONDS;
     initialViewRef.current = { minPxPerSec: initialPxPerSec, scrollTime: 0 };
 
@@ -55,7 +57,7 @@ export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: numb
     });
 
     const waveSurfer = WaveSurfer.create({
-      container: spectrogramContainerRef.current,
+      container: container,
       url: audioUrl,
       sampleRate: DECODE_SAMPLE_RATE_HZ,
       height: 0,
@@ -68,18 +70,7 @@ export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: numb
       plugins: [spectrogramPlugin, timeLinePlugin],
     });
 
-    waveSurferInstanceRef.current = waveSurfer;
-    waveSurfer.on('ready', (readyAudioDuration) => {
-      setAudioDuration(readyAudioDuration);
-      setIsReadyAudio(true);
-    });
-
-    return () => {
-      waveSurfer.destroy();
-      waveSurferInstanceRef.current = null;
-      setIsReadyAudio(false);
-      setAudioDuration(0);
-    };
+    return onSpectrogramReady(waveSurferInstanceRef, waveSurfer, setAudioDuration, setIsReadyAudio);
   }, [audioUrl, maxFrequencyHz, theme]);
 
   const applyZoomView = useCallback((view: InitialView, keepAutoScroll: boolean) => {

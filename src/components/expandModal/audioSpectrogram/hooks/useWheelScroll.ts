@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { TIME_AXIS_INTERVAL_SECONDS } from '../consts/audioSpectrogram.consts';
 import type { SpectrogramInteractionContext } from '../types/audioSpectrogram.types';
+import { onSpectrogramWheel } from '../utils/spectrogramActions';
 
 export const useWheelScroll = ({
   spectrogramContainerRef,
@@ -37,10 +38,6 @@ export const useWheelScroll = ({
       waveSurfer.setScrollTime(nextScrollTime);
     };
 
-    container.addEventListener('wheel', handleWheel, { capture: true, passive: false });
-
-    return () => {
-      container.removeEventListener('wheel', handleWheel, { capture: true });
-    };
+    return onSpectrogramWheel(spectrogramContainerRef, handleWheel);
   }, [audioDuration, spectrogramContainerRef, isReadyAudio, waveSurferInstanceRef]);
 };
