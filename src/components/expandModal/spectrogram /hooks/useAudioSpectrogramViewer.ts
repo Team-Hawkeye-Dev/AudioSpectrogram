@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material';
 import WaveSurfer from 'wavesurfer.js';
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.js';
@@ -13,22 +13,9 @@ import {
   VISIBLE_WINDOW_SECONDS,
 } from '../consts/spectrogram.consts';
 import { formatXAxisTimestamp } from '../utils/formatXaxisTimestamp';
+import type { AudioSpectrogramViewerProps, InitialView } from '../types/spectrogram.types';
 
-export interface InitialView {
-  minPxPerSec: number;
-  scrollTime: number;
-}
-
-interface UseAudioSpectrogramViewerProps {
-  spectrogramContainerRef: RefObject<HTMLDivElement | null>;
-  waveSurferInstanceRef: RefObject<WaveSurfer | null>;
-  initialViewRef: RefObject<InitialView | null>;
-  audioDuration: number;
-  isReadyAudio: boolean;
-  applyZoomView: (view: InitialView, keepAutoScroll: boolean) => void;
-}
-
-export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: number): UseAudioSpectrogramViewerProps => {
+export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: number): AudioSpectrogramViewerProps => {
   const theme = useTheme();
   const spectrogramContainerRef = useRef<HTMLDivElement | null>(null);
   const waveSurferInstanceRef = useRef<WaveSurfer | null>(null);

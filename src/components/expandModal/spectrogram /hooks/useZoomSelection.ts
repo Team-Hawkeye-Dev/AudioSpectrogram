@@ -1,18 +1,7 @@
-import { useCallback, useMemo, useRef } from 'react';
-import type { RefObject } from 'react';
-import type WaveSurfer from 'wavesurfer.js';
-import type { InitialView } from './useAudioSpectrogramViewer';
+import { useCallback, useMemo } from 'react';
+import type { AudioSpectrogramViewerProps } from '../types/spectrogram.types';
 import { useDragSelection } from './useDragSelection';
 import { useWheelScroll } from './useWheelScroll';
-
-interface UseZoomSelectionProps {
-  spectrogramContainerRef: RefObject<HTMLDivElement | null>;
-  waveSurferInstanceRef: RefObject<WaveSurfer | null>;
-  initialViewRef: RefObject<InitialView | null>;
-  audioDuration: number;
-  isReadyAudio: boolean;
-  applyZoomView: (view: InitialView, keepAutoScroll: boolean) => void;
-}
 
 export const useZoomSelection = ({
   spectrogramContainerRef,
@@ -21,12 +10,10 @@ export const useZoomSelection = ({
   audioDuration,
   isReadyAudio,
   applyZoomView,
-}: UseZoomSelectionProps) => {
+}: AudioSpectrogramViewerProps) => {
   const waveSurfer = waveSurferInstanceRef.current;
   const container = spectrogramContainerRef.current;
   const initialView = initialViewRef.current;
-  const applyZoomViewRef = useRef(applyZoomView);
-  applyZoomViewRef.current = applyZoomView;
 
   useWheelScroll({
     spectrogramContainerRef,
@@ -47,10 +34,10 @@ export const useZoomSelection = ({
     audioDuration,
     isReadyAudio,
     onZoomIn: (minPxPerSec, scrollTime) => {
-      applyZoomViewRef.current({ minPxPerSec, scrollTime }, false);
+      applyZoomView({ minPxPerSec, scrollTime }, false);
     },
     onZoomOut: (minPxPerSec, scrollTime) => {
-      applyZoomViewRef.current({ minPxPerSec, scrollTime }, minPxPerSec === minZoom);
+      applyZoomView({ minPxPerSec, scrollTime }, minPxPerSec === minZoom);
     },
   });
 

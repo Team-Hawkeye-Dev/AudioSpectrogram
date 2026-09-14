@@ -1,20 +1,13 @@
-import { useEffect, type RefObject } from 'react';
-import type WaveSurfer from 'wavesurfer.js';
+import { useEffect } from 'react';
 import { TIME_AXIS_INTERVAL_SECONDS } from '../consts/spectrogram.consts';
-
-interface UseWheelScrollProps {
-  spectrogramContainerRef: RefObject<HTMLDivElement | null>;
-  waveSurferInstanceRef: RefObject<WaveSurfer | null>;
-  audioDuration: number;
-  isReadyAudio: boolean;
-}
+import type { SpectrogramInteractionContext } from '../types/spectrogram.types';
 
 export const useWheelScroll = ({
   spectrogramContainerRef,
   waveSurferInstanceRef,
   audioDuration,
   isReadyAudio,
-}: UseWheelScrollProps) => {
+}: SpectrogramInteractionContext) => {
   useEffect(() => {
     const container = spectrogramContainerRef.current;
     if (!isReadyAudio || !container) {

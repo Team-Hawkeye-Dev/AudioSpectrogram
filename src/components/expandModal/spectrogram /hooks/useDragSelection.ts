@@ -1,18 +1,15 @@
-import { useRef, useState, type PointerEvent, type RefObject } from 'react';
+import { useState, useRef, type PointerEvent } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 import { CONTAINER_CENTER_RATIO, DRAG_ZOOM_OUT_FACTOR, VISIBLE_WINDOW_SECONDS } from '../consts/spectrogram.consts';
 import { pixelToTimeInSeconds } from '../utils/pixelToTime';
+import type { SpectrogramInteractionContext } from '../types/spectrogram.types';
 
 interface Selection {
-    startPx: number;
-    currentPx: number;
+    startPx: number
+    currentPx: number
 }
 
-interface UseDragSelectionProps {
-    spectrogramContainerRef: RefObject<HTMLDivElement | null>
-    waveSurferInstanceRef: RefObject<WaveSurfer | null>
-    audioDuration: number
-    isReadyAudio: boolean
+interface UseDragSelectionProps extends SpectrogramInteractionContext {
     onZoomIn: (minPxPerSec: number, scrollTime: number) => void
     onZoomOut: (minPxPerSec: number, scrollTime: number) => void
 }
@@ -28,7 +25,7 @@ spectrogramContainerRef, waveSurferInstanceRef, audioDuration,  isReadyAudio, on
     const getRect = (target: HTMLElement) => target.getBoundingClientRect()
 
     const onDragStart = (event: PointerEvent<HTMLDivElement>) => {
-        if (!isReadyAudio || event.button !== LEFT_MOUSE_CLICK) return 
+        if (!isReadyAudio || event.button !== LEFT_MOUSE_CLICK) return
         const startPx = event.clientX - getRect(event.currentTarget).left
         startPxRef.current = startPx
         setSelection({startPx, currentPx: startPx})
@@ -36,7 +33,7 @@ spectrogramContainerRef, waveSurferInstanceRef, audioDuration,  isReadyAudio, on
     }
 
     const onDragMove = (event: PointerEvent<HTMLDivElement>) => {
-        if (!selection) return 
+        if (!selection) return
         const currentPx = event.clientX - getRect(event.currentTarget).left
         setSelection((prev) => prev ? {...prev, currentPx} : null)
     }
@@ -62,7 +59,7 @@ spectrogramContainerRef, waveSurferInstanceRef, audioDuration,  isReadyAudio, on
 
     const onDragEnd = (event: PointerEvent<HTMLDivElement>) => {
        const waveSurfer = waveSurferInstanceRef.current
-       const startPx = startPxRef.current
+    const startPx = startPxRef.current
        startPxRef.current = null
        setSelection(null)
 
