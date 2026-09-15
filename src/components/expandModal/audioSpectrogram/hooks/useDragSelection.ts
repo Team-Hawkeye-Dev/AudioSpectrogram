@@ -23,9 +23,6 @@ spectrogramContainerRef, waveSurferInstanceRef, audioDuration,  isReadyAudio, on
 
     const getRect = (target: HTMLElement) => target.getBoundingClientRect()
 
-    // WaveSurfer has no built-in pixel-to-time conversion. viewportPixelX is relative
-    // to the visible (scrolled) viewport, so add the scroll offset to place it on the
-    // full waveform, then divide by the zoom scale (pixels per second) to get seconds.
     const pixelToTimeInSeconds = useCallback((waveSurfer: WaveSurfer, viewportPixelX: number): number => {
         const absolutePixelX = waveSurfer.getScroll() + viewportPixelX
         return absolutePixelX / waveSurfer.options.minPxPerSec
@@ -47,11 +44,16 @@ spectrogramContainerRef, waveSurferInstanceRef, audioDuration,  isReadyAudio, on
 
     const zoomOutFromLeftDrag = (waveSurfer: WaveSurfer, width: number) => {
         const minZoom = width / VISIBLE_WINDOW_SECONDS
-        const nextMinPxPerSec = Math.max(minZoom, waveSurfer.options.minPxPerSec / DRAG_ZOOM_OUT_FACTOR)
+        const zoomedOutPxPerSec = waveSurfer.options.minPxPerSec / DRAG_ZOOM_OUT_FACTOR
+        const nextMinPxPerSec = Math.max(minZoom, zoomedOutPxPerSec)
+
         const visibleDuration = width / nextMinPxPerSec
-        const centerTime = pixelToTimeInSeconds(waveSurfer, width * CONTAINER_CENTER_RATIO)
+        const containerCenterPx = width * CONTAINER_CENTER_RATIO
+        const centerTime = pixelToTimeInSeconds(waveSurfer, containerCenterPx)
+        
         const maxScroll = Math.max(0, audioDuration - visibleDuration)
-        const nextScroll = Math.min(maxScroll, Math.max(0, centerTime - visibleDuration * CONTAINER_CENTER_RATIO))
+        const centeredScrollTime = centerTime - visibleDuration * CONTAINER_CENTER_RATIO
+        const nextScroll = Math.min(maxScroll, Math.max(0, centeredScrollTime))
         onZoomOut(nextMinPxPerSec, nextScroll)
     }
 
@@ -66,7 +68,7 @@ spectrogramContainerRef, waveSurferInstanceRef, audioDuration,  isReadyAudio, on
 
     const onDragEnd = (event: PointerEvent<HTMLDivElement>) => {
        const waveSurfer = waveSurferInstanceRef.current
-    const startPx = startPxRef.current
+       const startPx = startPxRef.current
        startPxRef.current = null
        setSelection(null)
 

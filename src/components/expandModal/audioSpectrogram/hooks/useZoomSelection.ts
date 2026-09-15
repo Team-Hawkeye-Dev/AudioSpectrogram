@@ -25,7 +25,8 @@ export const useZoomSelection = ({
   const minZoom = useMemo(() => {
     if (!initialView || !spectrogramContainer) return initialView?.minPxPerSec ?? 0;
 
-    return Math.max(initialView.minPxPerSec, spectrogramContainer.clientWidth / audioDuration);
+    const fitToWidthPxPerSec = spectrogramContainer.clientWidth / audioDuration;
+    return Math.max(initialView.minPxPerSec, fitToWidthPxPerSec);
   }, [audioDuration, spectrogramContainer, initialView]);
 
   const { selection, onDragStart, onDragMove, onDragEnd } = useDragSelection({
