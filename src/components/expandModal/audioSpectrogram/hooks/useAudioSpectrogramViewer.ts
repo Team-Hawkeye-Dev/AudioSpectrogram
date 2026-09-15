@@ -30,11 +30,11 @@ export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: numb
   const zoomDebounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-     const container = spectrogramContainerRef.current;
-    if (!container) return;
+     const spectrogramContainer = spectrogramContainerRef.current;
+    if (!spectrogramContainer) return;
 
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
+    const containerWidth = spectrogramContainer.clientWidth;
+    const containerHeight = spectrogramContainer.clientHeight;
     const initialPxPerSec = containerWidth / VISIBLE_WINDOW_SECONDS;
     initialViewRef.current = { minPxPerSec: initialPxPerSec, scrollTime: 0 };
 
@@ -66,7 +66,7 @@ export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: numb
     });
 
     const waveSurfer = WaveSurfer.create({
-      container: container,
+      container: spectrogramContainer,
       url: audioUrl,
       sampleRate: DECODE_SAMPLE_RATE_HZ,
       height: 0,
@@ -81,9 +81,7 @@ export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: numb
 
     const cleanupSpectrogram = onSpectrogramReady(waveSurferInstanceRef, waveSurfer, setAudioDuration, setIsReadyAudio);
     return () => {
-      if (zoomDebounceTimeoutRef.current) {
-        clearTimeout(zoomDebounceTimeoutRef.current);
-      }
+      if (zoomDebounceTimeoutRef.current) clearTimeout(zoomDebounceTimeoutRef.current);
       cleanupSpectrogram();
     };
   }, [audioUrl, maxFrequencyHz, theme]);
@@ -91,15 +89,13 @@ export const useAudioSpectrogramViewer = (audioUrl: string, maxFrequencyHz: numb
   const applyZoomView = useCallback((view: InitialView, keepAutoScroll: boolean) => {
     if (zoomDebounceTimeoutRef.current) clearTimeout(zoomDebounceTimeoutRef.current);
     zoomDebounceTimeoutRef.current = setTimeout(() => {
-      const waveSurfer = waveSurferInstanceRef.current;
-      if (!waveSurfer) {
-        return;
-      }
+      const waveSurferInstance = waveSurferInstanceRef.current;
+      if (!waveSurferInstance) return;
 
       const { minPxPerSec, scrollTime } = view;
-      waveSurfer.setOptions({ autoScroll: keepAutoScroll });
-      waveSurfer.zoom(minPxPerSec);
-      waveSurfer.setScrollTime(scrollTime);
+      waveSurferInstance.setOptions({ autoScroll: keepAutoScroll });
+      waveSurferInstance.zoom(minPxPerSec);
+      waveSurferInstance.setScrollTime(scrollTime);
     }, ZOOM_DEBOUNCE_MS);
   }, []);
 

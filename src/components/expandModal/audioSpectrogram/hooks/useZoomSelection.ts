@@ -11,8 +11,8 @@ export const useZoomSelection = ({
   isReadyAudio,
   applyZoomView,
 }: AudioSpectrogramViewerProps) => {
-  const waveSurfer = waveSurferInstanceRef.current;
-  const container = spectrogramContainerRef.current;
+  const waveSurferInstance = waveSurferInstanceRef.current;
+  const spectrogramContainer = spectrogramContainerRef.current;
   const initialView = initialViewRef.current;
 
   useWheelScroll({
@@ -23,10 +23,10 @@ export const useZoomSelection = ({
   });
 
   const minZoom = useMemo(() => {
-    if (!initialView || !container) return initialView?.minPxPerSec ?? 0;
+    if (!initialView || !spectrogramContainer) return initialView?.minPxPerSec ?? 0;
 
-    return Math.max(initialView.minPxPerSec, container.clientWidth / audioDuration);
-  }, [audioDuration, container, initialView]);
+    return Math.max(initialView.minPxPerSec, spectrogramContainer.clientWidth / audioDuration);
+  }, [audioDuration, spectrogramContainer, initialView]);
 
   const { selection, onDragStart, onDragMove, onDragEnd } = useDragSelection({
     spectrogramContainerRef,
@@ -42,12 +42,12 @@ export const useZoomSelection = ({
   });
 
   const resetZoom = useCallback(() => {
-    if (!waveSurfer || !container || !initialView)  return;
+    if (!waveSurferInstance) return;
 
-    waveSurfer.setOptions({ autoScroll: true });
-    waveSurfer.zoom(minZoom);
-    waveSurfer.setScrollTime(0);
-  }, [container, initialView, minZoom, waveSurfer]);
+    waveSurferInstance.setOptions({ autoScroll: true });
+    waveSurferInstance.zoom(minZoom);
+    waveSurferInstance.setScrollTime(0);
+  }, [minZoom, waveSurferInstance]);
 
   return {
     selection,
