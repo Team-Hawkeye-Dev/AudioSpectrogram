@@ -2,12 +2,13 @@ import { useCallback, useMemo } from 'react';
 import type { AudioSpectrogramViewerProps } from '../types/audioSpectrogram.types';
 import { useDragSelection } from './useDragSelection';
 import { useWheelScroll } from './useWheelScroll';
+import { useMassiviAppStore } from '../../../../store/useStore';
 
 export const useZoomSelection = ({
   spectrogramContainerRef,
   waveSurferInstanceRef,
   initialViewRef,
-  audioDuration,
+  spectrogramPlotType,
   isReadyAudio,
   applyZoomView,
 }: AudioSpectrogramViewerProps) => {
@@ -15,10 +16,12 @@ export const useZoomSelection = ({
   const spectrogramContainer = spectrogramContainerRef.current;
   const initialView = initialViewRef.current;
 
+  const audioDuration = useMassiviAppStore((state) => state.expandSection.spectrogramAudioDuration[spectrogramPlotType])
+
   useWheelScroll({
     spectrogramContainerRef,
     waveSurferInstanceRef,
-    audioDuration,
+    spectrogramPlotType,
     isReadyAudio,
   });
 
@@ -32,7 +35,7 @@ export const useZoomSelection = ({
   const { selection, onDragStart, onDragMove, onDragEnd } = useDragSelection({
     spectrogramContainerRef,
     waveSurferInstanceRef,
-    audioDuration,
+    spectrogramPlotType,
     isReadyAudio,
     onZoomIn: (minPxPerSec, scrollTime) => {
       applyZoomView({ minPxPerSec, scrollTime }, false);

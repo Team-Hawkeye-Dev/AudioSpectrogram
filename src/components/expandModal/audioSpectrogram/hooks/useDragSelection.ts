@@ -2,6 +2,7 @@ import { useCallback, useState, useRef, type PointerEvent } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 import { CONTAINER_CENTER_RATIO, DRAG_ZOOM_OUT_FACTOR, VISIBLE_WINDOW_SECONDS } from '../consts/audioSpectrogram.consts';
 import type { SpectrogramInteractionContext } from '../types/audioSpectrogram.types';
+import { useMassiviAppStore } from '../../../../store/useStore';
 
 interface Selection {
     startPx: number
@@ -16,8 +17,9 @@ interface UseDragSelectionProps extends SpectrogramInteractionContext {
 const LEFT_MOUSE_CLICK = 0
 
 export const useDragSelection = ({
-spectrogramContainerRef, waveSurferInstanceRef, audioDuration,  isReadyAudio, onZoomIn, onZoomOut
+spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudio, onZoomIn, onZoomOut
 }: UseDragSelectionProps) => {
+    const audioDuration = useMassiviAppStore((state) => state.expandSection.spectrogramAudioDuration[spectrogramPlotType])
     const [selection, setSelection] = useState<Selection | null>(null)
     const startPxRef = useRef<number | null>(null)
 

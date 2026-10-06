@@ -6,12 +6,20 @@ import {
   StyledModalContentContainer,
 } from "./ExpandModal.styles";
 import { AudioSpectrogram } from "./audioSpectrogram/AudioSpectrogram";
+import { useMassiviAppStore } from "../../store/useStore";
 
 export const ExpandModal = () => {
+  const isExpandPolygonModalOpen = useMassiviAppStore(
+    (state) => state.expandSection.isExpandPolygonModalOpen,
+  );
+  const setIsExpandModalOpen = useMassiviAppStore(
+    (state) => state.expandSection.setIsExpandModalOpen,
+  );
+
   return (
-    <StyledModal open={true}>
+    <StyledModal open={isExpandPolygonModalOpen} onClose={() => setIsExpandModalOpen(false)}>
       <StyledModalContentContainer>
-        <CloseButtonWrapper>
+        <CloseButtonWrapper onClick={() => setIsExpandModalOpen(false)}>
           <CloseIcon fontSize="medium" />
         </CloseButtonWrapper>
         <SpectrogramContainer>

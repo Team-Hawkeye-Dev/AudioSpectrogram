@@ -1,8 +1,8 @@
-import type { RefObject } from 'react';
+import type { MutableRefObject, RefObject } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 
 export const onSpectrogramReady = (
-  waveSurferInstanceRef: RefObject<WaveSurfer | null>,
+  waveSurferInstanceRef: MutableRefObject<WaveSurfer | null>,
   waveSurfer: WaveSurfer,
   setAudioDuration: (audioDuration: number) => void,
   setIsReadyAudio: (isReadyAudio: boolean) => void,

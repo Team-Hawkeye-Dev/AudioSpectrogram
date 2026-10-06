@@ -33,17 +33,16 @@ export const AudioSpectrogramViewer = ({
     spectrogramContainerRef,
     waveSurferInstanceRef,
     initialViewRef,
-    audioDuration,
     isReadyAudio,
     applyZoomView,
-  } = useAudioSpectrogramViewer(audioUrl, maxHz);
+  } = useAudioSpectrogramViewer(audioUrl, maxHz, spectrogramPlotType);
 
   const { selection, onDragStart, onDragMove, onDragEnd, resetZoom } =
     useZoomSelection({
       spectrogramContainerRef,
       waveSurferInstanceRef,
       initialViewRef,
-      audioDuration,
+      spectrogramPlotType,
       isReadyAudio,
       applyZoomView,
     });
