@@ -1,12 +1,16 @@
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import { AudioSpectrogramViewer } from "./components/audioSpectrogramViewer/AudioSpectrogramViewer";
 import { SpectrogramType } from "./consts/audioSpectrogram.consts";
-import { useAudioUrl } from "./hooks/useAudioUrl";
+import { useAudioSpectrogramUrl } from "./hooks/useAudioSpectrogramUrl";
+import { useMassiviAppStore } from "../../../store/useStore";
 import { ExpandModalContainer, SpectrogramTitle } from "./AudioSpectrogram.styles";
 
 export const AudioSpectrogram = () => {
-  const topUrl = useAudioUrl();
-  const bottomUrl = useAudioUrl();
+  const topGuid = useMassiviAppStore((state) => state.expandSection.topMetadata?.topGuid ?? null);
+  const bottomGuid = useMassiviAppStore((state) => state.expandSection.bottomMetadata?.bottomGuid ?? null);
+
+  const topUrl = useAudioSpectrogramUrl(topGuid, SpectrogramType.TOP);
+  const bottomUrl = useAudioSpectrogramUrl(bottomGuid, SpectrogramType.BOTTOM);
 
   return (
     <ExpandModalContainer>

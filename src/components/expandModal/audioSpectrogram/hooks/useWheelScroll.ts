@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { SpectrogramType, TIME_AXIS_INTERVAL_SECONDS } from '../consts/audioSpectrogram.consts';
+import { TIME_AXIS_INTERVAL_SECONDS } from '../consts/audioSpectrogram.consts';
 import type { SpectrogramInteractionContext } from '../types/audioSpectrogram.types';
 import { onSpectrogramWheel } from '../utils/spectrogramActions';
 import { useMassiviAppStore } from '../../../../store/useStore';
