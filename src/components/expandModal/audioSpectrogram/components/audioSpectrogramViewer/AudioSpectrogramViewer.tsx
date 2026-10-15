@@ -1,21 +1,15 @@
-import { Button } from "@mui/material";
-import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import {
   FREQUENCY_STEP,
   SPECTROGRAM_FREQUENCY_CONFIG,
   type SpectrogramType,
 } from "../../consts/audioSpectrogram.consts";
-import { useAudioSpectrogramViewer } from "../../hooks/useAudioSpectrogramViewer";
-import { useZoomSelection } from "../../hooks/useZoomSelection";
+import { WavePlotView } from "../wavePlotView/WavePlotView";
 import {
   FrequencyLabel,
   FrequencyLabelList,
-  ResetZoomButton,
-  SpectrgoramRowContainer,
   SpectrogramPlotRow,
+  SpectrogramRowContainer,
   SpectrogramViewerRootContainer,
-  SelectionHightlight,
-  WavePlotWrapper,
 } from "./AudioSpectrogramViewer.styles";
 
 interface SpectrogramViewerProps {
@@ -29,24 +23,6 @@ export const AudioSpectrogramViewer = ({
 }: SpectrogramViewerProps) => {
   const { maxHz, stepHz } = SPECTROGRAM_FREQUENCY_CONFIG[spectrogramPlotType];
 
-  const {
-    spectrogramContainerRef,
-    waveSurferInstanceRef,
-    initialViewRef,
-    isReadyAudio,
-    applyZoomView,
-  } = useAudioSpectrogramViewer(audioUrl, maxHz, spectrogramPlotType);
-
-  const { selection, onDragStart, onDragMove, onDragEnd, resetZoom } =
-    useZoomSelection({
-      spectrogramContainerRef,
-      waveSurferInstanceRef,
-      initialViewRef,
-      spectrogramPlotType,
-      isReadyAudio,
-      applyZoomView,
-    });
-
   const frequencyLabelsHz = Array.from(
     { length: maxHz / stepHz + 1 },
     (_, index) => maxHz - index * stepHz,
@@ -54,7 +30,7 @@ export const AudioSpectrogramViewer = ({
 
   return (
     <SpectrogramViewerRootContainer>
-      <SpectrgoramRowContainer>
+      <SpectrogramRowContainer>
         <SpectrogramPlotRow>
           <FrequencyLabelList>
             {frequencyLabelsHz.map((frequencyHz) => {
@@ -64,33 +40,13 @@ export const AudioSpectrogramViewer = ({
               );
             })}
           </FrequencyLabelList>
-          <WavePlotWrapper
-            ref={spectrogramContainerRef}
-            onPointerDown={onDragStart}
-            onPointerMove={onDragMove}
-            onPointerUp={onDragEnd}
-          >
-            {selection && (
-              <SelectionHightlight
-                style={{
-                  left: Math.min(selection.startPx, selection.currentPx),
-                  width: Math.abs(selection.currentPx - selection.startPx),
-                }}
-              />
-            )}
-          </WavePlotWrapper>
+          <WavePlotView
+            audioUrl={audioUrl}
+            maxFrequencyHz={maxHz}
+            spectrogramPlotType={spectrogramPlotType}
+          />
         </SpectrogramPlotRow>
-        <ResetZoomButton>
-          <Button
-            onClick={resetZoom}
-            disabled={!isReadyAudio}
-            size="small"
-            startIcon={<ZoomOutMapIcon fontSize="small" />}
-          >
-            Reset zoom
-          </Button>
-        </ResetZoomButton>
-      </SpectrgoramRowContainer>
+      </SpectrogramRowContainer>
     </SpectrogramViewerRootContainer>
   );
 };
