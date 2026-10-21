@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { ExpandModal } from "./components/expandModal/ExpandModal";
-import { SpectrogramType } from "./components/expandModal/audioSpectrogram/consts/audioSpectrogram.consts";
+import { AnchorValidationModal } from "./components/anchorValidationModal/AnchorValidationModal";
+import { SpectrogramType } from "./components/anchorValidationModal/audioSpectrogram/consts/audioSpectrogram.consts";
 import { useMassiviAppStore } from "./store/useStore";
 
 function App() {
-  const setIsExpandModalOpen = useMassiviAppStore(
+  const setIsAnchorValidationModalOpen = useMassiviAppStore(
     (state) => state.anchorValidationSection.setIsAnchorValidationModalOpen,
   );
   const setSpectrogramAudioGuid = useMassiviAppStore(
@@ -14,10 +14,10 @@ function App() {
   useEffect(() => {
     setSpectrogramAudioGuid(SpectrogramType.TOP, crypto.randomUUID());
     setSpectrogramAudioGuid(SpectrogramType.BOTTOM, crypto.randomUUID());
-    setIsExpandModalOpen(true);
-  }, [setSpectrogramAudioGuid, setIsExpandModalOpen]);
+    setIsAnchorValidationModalOpen(true);
+  }, [setSpectrogramAudioGuid, setIsAnchorValidationModalOpen]);
 
-  return <ExpandModal />;
+  return <AnchorValidationModal />;
 }
 
 export default App;

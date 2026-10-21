@@ -19,7 +19,7 @@ import { useMassiviAppStore } from "../../../store/useStore";
 import { useAreAllSpectrogramsReady } from "./hooks/useAreAllSpectrogramsReady";
 import type { AudioSpectrogramSource } from "./types/audioSpectrogram.types";
 
-export const AudioSpectrogram = () => {
+export const AudioSpectrogramModal = () => {
   const spectrogramAudioGuid = useMassiviAppStore((state) => state.anchorValidationSection.spectrogramAudioGuid)
   const areAllSpectrogramReady = useAreAllSpectrogramsReady()
 

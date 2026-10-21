@@ -4,7 +4,7 @@ import {
     DEFAULT_SPECTROGRAM_AUDIO_GUID,
     DEFAULT_SPECTROGRAM_WINDOWS,
     type SpectrogramType,
-} from '../../components/expandModal/audioSpectrogram/consts/audioSpectrogram.consts';
+} from '../../components/anchorValidationModal/audioSpectrogram/consts/audioSpectrogram.consts';
 import { updateSlice } from '../storeSlices';
 import { StoreSlices, type MassiviAppState } from '../useStore';
 

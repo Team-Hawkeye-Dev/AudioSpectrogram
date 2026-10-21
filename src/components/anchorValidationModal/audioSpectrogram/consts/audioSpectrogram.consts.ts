@@ -21,7 +21,6 @@ export const TIME_AXIS_HEIGHT_PX = 24;
 export const SPECTROGRAM_FFT_SAMPLES = 512;
 export const FREQUENCY_MIN_HZ = 0;
 export const DECODE_SAMPLE_RATE_HZ = 16000;
-export const HZ_PER_KHZ = 1000;
 
 export const MAX_HZ_BOTTOM_SPECTROGRAM = 8000;
 export const MAX_HZ_TOP_SPECTROGRAM = 4000;
