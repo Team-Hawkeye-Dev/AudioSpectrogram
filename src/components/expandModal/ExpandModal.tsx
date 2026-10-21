@@ -10,10 +10,10 @@ import { useMassiviAppStore } from "../../store/useStore";
 
 export const ExpandModal = () => {
   const isExpandPolygonModalOpen = useMassiviAppStore(
-    (state) => state.expandSection.isExpandPolygonModalOpen,
+    (state) => state.anchorValidationSection.isAnchorValidationModalOpen,
   );
   const setIsExpandModalOpen = useMassiviAppStore(
-    (state) => state.expandSection.setIsExpandModalOpen,
+    (state) => state.anchorValidationSection.setIsAnchorValidationModalOpen,
   );
 
   return (

@@ -1,35 +1,64 @@
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
-import { AudioSpectrogramViewer } from "./components/audioSpectrogramViewer/AudioSpectrogramViewer";
-import { SpectrogramType } from "./consts/audioSpectrogram.consts";
-import { useAudioSpectrogramUrl } from "./hooks/useAudioSpectrogramUrl";
+import { CircularProgress } from "@mui/material";
+import { AudioSpectrogramSourcePlot } from "./components/audioSpectrogramSourcePlot/AudioSpectrogramSourcePlot";
+import {
+  BOTTOM_SPECTROGRAM_STEP_HZ,
+  MAX_HZ_BOTTOM_SPECTROGRAM,
+  MAX_HZ_TOP_SPECTROGRAM,
+  SpectrogramType,
+  TOP_SPECTROGRAM_STEP_HZ,
+} from "./consts/audioSpectrogram.consts";
+import {
+  AnchorValidationModalContainer,
+  SpectrogramLoadingOverlay,
+  SpectrogramPlotArea,
+  SpectrogramPlotGroup,
+  SpectrogramTitle,
+} from "./AudioSpectrogram.styles";
 import { useMassiviAppStore } from "../../../store/useStore";
-import { ExpandModalContainer, SpectrogramTitle } from "./AudioSpectrogram.styles";
+import { useAreAllSpectrogramsReady } from "./hooks/useAreAllSpectrogramsReady";
+import type { AudioSpectrogramSource } from "./types/audioSpectrogram.types";
 
 export const AudioSpectrogram = () => {
-  const topGuid = useMassiviAppStore((state) => state.expandSection.topMetadata?.topGuid ?? null);
-  const bottomGuid = useMassiviAppStore((state) => state.expandSection.bottomMetadata?.bottomGuid ?? null);
+  const spectrogramAudioGuid = useMassiviAppStore((state) => state.anchorValidationSection.spectrogramAudioGuid)
+  const areAllSpectrogramReady = useAreAllSpectrogramsReady()
 
-  const topUrl = useAudioSpectrogramUrl(topGuid, SpectrogramType.TOP);
-  const bottomUrl = useAudioSpectrogramUrl(bottomGuid, SpectrogramType.BOTTOM);
+  const audioSpectrogramSources: AudioSpectrogramSource[] = [
+    {
+      audioGuid: spectrogramAudioGuid[SpectrogramType.TOP],
+      spectrogramType: SpectrogramType.TOP,
+      maxHz: MAX_HZ_TOP_SPECTROGRAM,
+      stepHz: TOP_SPECTROGRAM_STEP_HZ
+    },
+    {
+      audioGuid: spectrogramAudioGuid[SpectrogramType.BOTTOM],
+      spectrogramType: SpectrogramType.BOTTOM,
+      maxHz: MAX_HZ_BOTTOM_SPECTROGRAM,
+      stepHz: BOTTOM_SPECTROGRAM_STEP_HZ
+    }
+  ]
 
   return (
-    <ExpandModalContainer>
+    <AnchorValidationModalContainer>
       <SpectrogramTitle>
         <GraphicEqIcon fontSize="small" />
         Spectrogram (switch icon)
       </SpectrogramTitle>
-      {topUrl && (
-        <AudioSpectrogramViewer
-          audioUrl={topUrl}
-          spectrogramPlotType={SpectrogramType.TOP}
-        />
-      )}
-      {bottomUrl && (
-        <AudioSpectrogramViewer
-          audioUrl={bottomUrl}
-          spectrogramPlotType={SpectrogramType.BOTTOM}
-        />
-      )}
-    </ExpandModalContainer>
+      <SpectrogramPlotArea>
+        {!areAllSpectrogramReady && (
+          <SpectrogramLoadingOverlay>
+            <CircularProgress/>
+          </SpectrogramLoadingOverlay>
+        )}
+        <SpectrogramPlotGroup ready={areAllSpectrogramReady}>
+          {audioSpectrogramSources.map((source) => (
+            <AudioSpectrogramSourcePlot
+              key={source.spectrogramType}
+              {...source}
+            />
+          ))}
+        </SpectrogramPlotGroup>
+      </SpectrogramPlotArea>
+    </AnchorValidationModalContainer>
   );
 };

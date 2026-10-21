@@ -7,11 +7,18 @@ export interface InitialView {
   scrollTime: number;
 }
 
+export interface AudioSpectrogramSource {
+  audioGuid: string | null;
+  spectrogramType: SpectrogramType;
+  maxHz: number;
+  stepHz: number
+}
+
 export interface AudioSpectrogramViewerProps {
-  spectrogramPlotType: SpectrogramType;
   spectrogramContainerRef: RefObject<HTMLDivElement | null>;
   waveSurferInstanceRef: RefObject<WaveSurfer | null>;
   initialViewRef: RefObject<InitialView | null>;
+    spectrogramPlotType: SpectrogramType;
   isReadyAudio: boolean;
   applyZoomView: (view: InitialView, keepAutoScroll: boolean) => void;
 }

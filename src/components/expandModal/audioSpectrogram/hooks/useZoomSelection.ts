@@ -12,11 +12,10 @@ export const useZoomSelection = ({
   isReadyAudio,
   applyZoomView,
 }: AudioSpectrogramViewerProps) => {
-  const waveSurferInstance = waveSurferInstanceRef.current;
   const spectrogramContainer = spectrogramContainerRef.current;
   const initialView = initialViewRef.current;
 
-  const audioDuration = useMassiviAppStore((state) => state.expandSection.spectrogramAudioDuration[spectrogramPlotType])
+  const audioDuration = useMassiviAppStore((state) => state.anchorValidationSection.spectrogramAudioDuration[spectrogramPlotType])
 
   useWheelScroll({
     spectrogramContainerRef,
@@ -27,7 +26,6 @@ export const useZoomSelection = ({
 
   const minZoom = useMemo(() => {
     if (!initialView || !spectrogramContainer) return initialView?.minPxPerSec ?? 0;
-
     const fitToWidthPxPerSec = spectrogramContainer.clientWidth / audioDuration;
     return Math.max(initialView.minPxPerSec, fitToWidthPxPerSec);
   }, [audioDuration, spectrogramContainer, initialView]);
@@ -37,6 +35,7 @@ export const useZoomSelection = ({
     waveSurferInstanceRef,
     spectrogramPlotType,
     isReadyAudio,
+    minZoomPxPerSec: minZoom,
     onZoomIn: (minPxPerSec, scrollTime) => {
       applyZoomView({ minPxPerSec, scrollTime }, false);
     },
@@ -46,12 +45,8 @@ export const useZoomSelection = ({
   });
 
   const resetZoom = useCallback(() => {
-    if (!waveSurferInstance) return;
-
-    waveSurferInstance.setOptions({ autoScroll: true });
-    waveSurferInstance.zoom(minZoom);
-    waveSurferInstance.setScrollTime(0);
-  }, [minZoom, waveSurferInstance]);
+    applyZoomView({minPxPerSec: minZoom, scrollTime: 0}, true)
+  }, [minZoom, applyZoomView]);
 
   return {
     selection,

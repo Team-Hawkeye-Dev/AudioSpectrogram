@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { TIME_AXIS_INTERVAL_SECONDS } from '../consts/audioSpectrogram.consts';
 import type { SpectrogramInteractionContext } from '../types/audioSpectrogram.types';
 import { onSpectrogramWheel } from '../utils/spectrogramActions';
@@ -10,8 +10,12 @@ export const useWheelScroll = ({
   spectrogramPlotType,
   isReadyAudio,
 }: SpectrogramInteractionContext) => {
-  const audioDuration = useMassiviAppStore((state) => state.expandSection.spectrogramAudioDuration[spectrogramPlotType])
-  const setSpectrogramWindow = useMassiviAppStore((state) => state.expandSection.setSpectrogramWindow)
+  const audioDuration = useMassiviAppStore((state) => state.anchorValidationSection.spectrogramAudioDuration[spectrogramPlotType])
+  const setSpectrogramWindow = useMassiviAppStore((state) => state.anchorValidationSection.setSpectrogramWindow)
+
+  const getScrollDirection = useMemo(
+    () => (deltaY: number)=> (deltaY < 0 ? 1 : -1), [],
+  );
 
   useEffect(() => {
     const container = spectrogramContainerRef.current;
@@ -23,7 +27,7 @@ export const useWheelScroll = ({
       const waveSurfer = waveSurferInstanceRef.current;
       if (!waveSurfer) return;
     
-      const direction = event.deltaY < 0 ? 1 : -1;
+      const scrollDirection = getScrollDirection(event.deltaY)
       const containerWidth = container.clientWidth;
       const minPxPerSec = waveSurfer.options.minPxPerSec;
       const visibleDuration = containerWidth / minPxPerSec;
@@ -31,18 +35,16 @@ export const useWheelScroll = ({
       const currentScrollTime = waveSurfer.getScroll() / minPxPerSec;
       const nextScrollTime = Math.min(
         maxScrollTime,
-        Math.max(0, currentScrollTime + direction * TIME_AXIS_INTERVAL_SECONDS),
+        Math.max(0, currentScrollTime + scrollDirection * TIME_AXIS_INTERVAL_SECONDS),
       );
 
-      waveSurfer.setOptions({ autoScroll: false });
       waveSurfer.setScrollTime(nextScrollTime);
-
       setSpectrogramWindow(spectrogramPlotType, {
         currentStartTime: nextScrollTime,
         currentEndTime: nextScrollTime + visibleDuration
       })
     };
 
-    return onSpectrogramWheel(spectrogramContainerRef, handleWheel);
-  }, [audioDuration, spectrogramContainerRef, isReadyAudio, waveSurferInstanceRef]);
+    return onSpectrogramWheel(spectrogramContainerRef, handleWheel)
+  }, [audioDuration, spectrogramContainerRef, isReadyAudio, waveSurferInstanceRef, getScrollDirection, setSpectrogramWindow, spectrogramPlotType]);
 };

@@ -3,7 +3,13 @@ import { SpectrogramType } from '../consts/audioSpectrogram.consts';
 import { topService } from '../../../../services/top/topService';
 import { bottomService } from '../../../../services/bottom/bottomService';
 
-const AUDIO_MIME_TYPE = 'audio/wav';
+const AUDIO_MIME_TYPE = 'audio/mpeg';
+
+export type AudioSpectrogramUrlStatus = {
+  audioUrl: string | undefined;
+  isFetching: boolean,
+  error: Error | null
+}
 
 const createAudioSpectrogramUrl = (base64Audio: string): string =>
   `data:${AUDIO_MIME_TYPE};base64,${base64Audio}`;
@@ -16,8 +22,11 @@ const fetchSoundData = (audioGuid: string, spectrogramType: SpectrogramType) =>
 export const useAudioSpectrogramUrl = (
   audioGuid: string | null,
   spectrogramType: SpectrogramType,
-): string | undefined => {
-  const { data: url } = useQuery({
+): AudioSpectrogramUrlStatus => {
+  const { data: audioUrl,
+    isFetching, 
+    error
+   } = useQuery({
     queryKey: ['audioSpectrogramUrl', spectrogramType, audioGuid],
     queryFn: async () => {
       if (!audioGuid) return undefined;
@@ -28,5 +37,5 @@ export const useAudioSpectrogramUrl = (
     enabled: !!audioGuid,
   });
 
-  return url;
+  return {audioUrl, isFetching, error};
 };

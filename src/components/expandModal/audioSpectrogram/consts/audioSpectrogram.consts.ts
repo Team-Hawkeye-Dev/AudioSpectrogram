@@ -1,5 +1,8 @@
+import type { SpectrogramWindow } from "../../../../store/slices/anchorValidationSectionSlice";
+
 export const VISIBLE_WINDOW_SECONDS = 90;
-export const ZOOM_DEBOUNCE_MS = 150;
+
+export const DEFAULT_INITIAL_SCROLL_TIME = 0;
 
 export const SECONDS_PER_MINUTE = 60;
 export const TIMESTAMP_SECONDS_PAD_LENGTH = 2;
@@ -7,6 +10,10 @@ export const TIMESTAMP_SECONDS_PAD_CHAR = '0';
 
 export const DRAG_ZOOM_OUT_FACTOR = 2;
 export const CONTAINER_CENTER_RATIO = 0.5;
+export const MIN_ZOOM_SELECTION_PX = 50;
+
+export const MAX_ZOOM_VISIBLE_SECONDS = 5;
+export const MAX_ZOOM_CANVAS_PX = 60000;
 
 export const TIME_AXIS_INTERVAL_SECONDS = 5;
 export const TIME_AXIS_HEIGHT_PX = 24;
@@ -14,7 +21,14 @@ export const TIME_AXIS_HEIGHT_PX = 24;
 export const SPECTROGRAM_FFT_SAMPLES = 512;
 export const FREQUENCY_MIN_HZ = 0;
 export const DECODE_SAMPLE_RATE_HZ = 16000;
-export const FREQUENCY_STEP = 1000;
+export const HZ_PER_KHZ = 1000;
+
+export const MAX_HZ_BOTTOM_SPECTROGRAM = 8000;
+export const MAX_HZ_TOP_SPECTROGRAM = 4000;
+export const TOP_SPECTROGRAM_STEP_HZ = 500;
+export const BOTTOM_SPECTROGRAM_STEP_HZ = 1000;
+
+export const SPECTROGRAM_COLOR_MAP = 'roseus';
 
 export const SpectrogramType = {
     TOP: 'top',
@@ -23,13 +37,24 @@ export const SpectrogramType = {
 
 export type SpectrogramType = (typeof SpectrogramType)[keyof typeof SpectrogramType];
 
-export const SPECTROGRAM_FREQUENCY_CONFIG = {
-    [SpectrogramType.TOP]: {
-        maxHz: 8000,
-        stepHz: FREQUENCY_STEP
-    },
-    [SpectrogramType.BOTTOM]: {
-        maxHz: 4000,
-        stepHz: 500
-    }
-}
+const DEFAULT_SPECTROGRAM_WINDOW: SpectrogramWindow = {
+    currentStartTime: 0,
+    currentEndTime: VISIBLE_WINDOW_SECONDS
+};
+
+export const DEFAULT_SPECTROGRAM_WINDOWS: Record<SpectrogramType, SpectrogramWindow> = {
+    [SpectrogramType.TOP]: { ...DEFAULT_SPECTROGRAM_WINDOW },
+    [SpectrogramType.BOTTOM]: { ...DEFAULT_SPECTROGRAM_WINDOW }
+};
+
+export const DEFAULT_SPECTROGRAM_AUDIO_DURATION: Record<SpectrogramType, number> = {
+    [SpectrogramType.TOP]: 0,
+    [SpectrogramType.BOTTOM]: 0
+};
+
+export const DEFAULT_SPECTROGRAM_AUDIO_GUID: Record<SpectrogramType, string | null> = {
+    [SpectrogramType.TOP]: null,
+    [SpectrogramType.BOTTOM]: null
+};
+
+

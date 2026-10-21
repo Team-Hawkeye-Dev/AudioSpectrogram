@@ -1,14 +1,14 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { expandSectionSlice, type ExpandSectionSlice } from './slices/expandSectionSlice';
+import { expandSectionSlice, type AnchorValidationSlice } from './slices/anchorValidationSectionSlice';
 import { mergeSlices } from './storeSlices';
 
 export type MassiviAppState = {
-    expandSection: ExpandSectionSlice;
+    anchorValidationSection: AnchorValidationSlice;
 };
 
 export const StoreSlices = {
-    EXPAND_SECTION: 'expandSection'
+    ANCHOR_VALIDATION_SECTION: 'anchorValidationSection'
 } as const;
 
 export type StoreSlices = (typeof StoreSlices)[keyof typeof StoreSlices];
@@ -17,7 +17,7 @@ export const useMassiviAppStore = create<MassiviAppState>()(
     devtools(
         persist(
             (...args) => ({
-                expandSection: expandSectionSlice(...args)
+                anchorValidationSection: expandSectionSlice(...args)
             }),
             {
                 name: 'massivi-store',

@@ -1,32 +1,21 @@
 import { useEffect } from "react";
 import { ExpandModal } from "./components/expandModal/ExpandModal";
-import { VISIBLE_WINDOW_SECONDS } from "./components/expandModal/audioSpectrogram/consts/audioSpectrogram.consts";
+import { SpectrogramType } from "./components/expandModal/audioSpectrogram/consts/audioSpectrogram.consts";
 import { useMassiviAppStore } from "./store/useStore";
 
 function App() {
   const setIsExpandModalOpen = useMassiviAppStore(
-    (state) => state.expandSection.setIsExpandModalOpen,
+    (state) => state.anchorValidationSection.setIsAnchorValidationModalOpen,
   );
-  const setTopMetadata = useMassiviAppStore(
-    (state) => state.expandSection.setTopMetadata,
-  );
-  const setBottomMetadata = useMassiviAppStore(
-    (state) => state.expandSection.setBottomMetadata,
+  const setSpectrogramAudioGuid = useMassiviAppStore(
+    (state) => state.anchorValidationSection.setSpectrogramAudioGuid,
   );
 
   useEffect(() => {
-    setTopMetadata({
-      topGuid: crypto.randomUUID(),
-      startSliceTime: 0,
-      endSliceTime: VISIBLE_WINDOW_SECONDS,
-    });
-    setBottomMetadata({
-      bottomGuid: crypto.randomUUID(),
-      startSliceTime: 0,
-      endSliceTime: VISIBLE_WINDOW_SECONDS,
-    });
+    setSpectrogramAudioGuid(SpectrogramType.TOP, crypto.randomUUID());
+    setSpectrogramAudioGuid(SpectrogramType.BOTTOM, crypto.randomUUID());
     setIsExpandModalOpen(true);
-  }, [setTopMetadata, setBottomMetadata, setIsExpandModalOpen]);
+  }, [setSpectrogramAudioGuid, setIsExpandModalOpen]);
 
   return <ExpandModal />;
 }

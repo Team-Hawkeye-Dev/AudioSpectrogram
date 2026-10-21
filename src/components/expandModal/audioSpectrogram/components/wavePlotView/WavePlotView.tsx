@@ -1,8 +1,6 @@
+import type { PointerEvent, RefObject } from "react";
 import { Button } from "@mui/material";
 import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
-import type { SpectrogramType } from "../../consts/audioSpectrogram.consts";
-import { useAudioSpectrogramViewer } from "../../hooks/useAudioSpectrogramViewer";
-import { useZoomSelection } from "../../hooks/useZoomSelection";
 import {
   ResetZoomButton,
   SelectionHighlight,
@@ -10,15 +8,19 @@ import {
   WavePlotWrapper,
 } from "./WavePlotView.styles";
 
-interface WavePlotViewProps {
-  audioUrl: string;
-  maxFrequencyHz: number;
-  spectrogramPlotType: SpectrogramType;
-}
-
 interface Selection {
   startPx: number;
   currentPx: number;
+}
+
+export interface WavePlotViewProps {
+  spectrogramContainerRef: RefObject<HTMLDivElement | null>;
+  isReadyAudio: boolean;
+  selection: Selection | null;
+  onDragStart: (event: PointerEvent<HTMLDivElement>) => void;
+  onDragMove: (event: PointerEvent<HTMLDivElement>) => void;
+  onDragEnd: (event: PointerEvent<HTMLDivElement>) => void;
+  resetZoom: () => void;
 }
 
 const getSelectionHighlightStyle = ({ startPx, currentPx }: Selection) => ({
@@ -27,50 +29,34 @@ const getSelectionHighlightStyle = ({ startPx, currentPx }: Selection) => ({
 });
 
 export const WavePlotView = ({
-  audioUrl,
-  maxFrequencyHz,
-  spectrogramPlotType,
-}: WavePlotViewProps) => {
-  const {
-    spectrogramContainerRef,
-    waveSurferInstanceRef,
-    initialViewRef,
-    isReadyAudio,
-    applyZoomView,
-  } = useAudioSpectrogramViewer(audioUrl, maxFrequencyHz, spectrogramPlotType);
-
-  const { selection, onDragStart, onDragMove, onDragEnd, resetZoom } =
-    useZoomSelection({
-      spectrogramContainerRef,
-      waveSurferInstanceRef,
-      initialViewRef,
-      spectrogramPlotType,
-      isReadyAudio,
-      applyZoomView,
-    });
-
-  return (
-    <WavePlotContainer>
-      <WavePlotWrapper
-        ref={spectrogramContainerRef}
-        onPointerDown={onDragStart}
-        onPointerMove={onDragMove}
-        onPointerUp={onDragEnd}
+  spectrogramContainerRef,
+  isReadyAudio,
+  selection,
+  onDragStart,
+  onDragMove,
+  onDragEnd,
+  resetZoom,
+}: WavePlotViewProps) => (
+  <WavePlotContainer>
+    <WavePlotWrapper
+      ref={spectrogramContainerRef}
+      onPointerDown={onDragStart}
+      onPointerMove={onDragMove}
+      onPointerUp={onDragEnd}
+    >
+      {selection && (
+        <SelectionHighlight style={getSelectionHighlightStyle(selection)} />
+      )}
+    </WavePlotWrapper>
+    <ResetZoomButton>
+      <Button
+        onClick={resetZoom}
+        disabled={!isReadyAudio}
+        size="small"
+        startIcon={<ZoomOutMapIcon fontSize="small" />}
       >
-        {selection && (
-          <SelectionHighlight style={getSelectionHighlightStyle(selection)} />
-        )}
-      </WavePlotWrapper>
-      <ResetZoomButton>
-        <Button
-          onClick={resetZoom}
-          disabled={!isReadyAudio}
-          size="small"
-          startIcon={<ZoomOutMapIcon fontSize="small" />}
-        >
-          Reset zoom
-        </Button>
-      </ResetZoomButton>
-    </WavePlotContainer>
-  );
-};
+        Reset zoom
+      </Button>
+    </ResetZoomButton>
+  </WavePlotContainer>
+);

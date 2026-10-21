@@ -1,0 +1,79 @@
+import type { Theme } from "@mui/material/styles";
+import WindowedSpectrogramPlugin, {
+    type WindowedSpectrogramPluginOptions,
+} from "wavesurfer.js/dist/plugins/spectrogram-windowed.js";
+import TimelinePlugin, { type TimelinePluginOptions } from "wavesurfer.js/dist/plugins/timeline.js";
+import {
+    DECODE_SAMPLE_RATE_HZ,
+    FREQUENCY_MIN_HZ,
+    SECONDS_PER_MINUTE,
+    SPECTROGRAM_COLOR_MAP,
+    SPECTROGRAM_FFT_SAMPLES,
+    TIME_AXIS_HEIGHT_PX,
+    TIME_AXIS_INTERVAL_SECONDS,
+    TIMESTAMP_SECONDS_PAD_CHAR,
+    TIMESTAMP_SECONDS_PAD_LENGTH,
+} from "./audioSpectrogram.consts";
+import { forceSpectrogramSegmentRendering, renderEveryTimeLabel } from "../utils/spectrogramActions";
+
+export const DEFAULT_WAVESURFER_OPTIONS = {
+    height: 0,
+    sampleRate: DECODE_SAMPLE_RATE_HZ,
+    interact: false,
+    dragToSeek: false,
+    autoScroll: true,
+    autoCenter: false,
+    hideScrollbar: true
+};
+
+const createSpectrogramOptions = (containerHeight: number, maxFrequencyHz: number): WindowedSpectrogramPluginOptions => ({
+    height: containerHeight,
+    frequencyMin: FREQUENCY_MIN_HZ,
+    frequencyMax: maxFrequencyHz,
+    fftSamples: SPECTROGRAM_FFT_SAMPLES,
+    colorMap: SPECTROGRAM_COLOR_MAP,
+    scale: 'linear',
+    progressiveLoading: false,
+    labels: false,
+});
+
+const createTimelinePluginOptions = (theme: Theme): TimelinePluginOptions => ({
+    height: TIME_AXIS_HEIGHT_PX,
+    timeInterval: TIME_AXIS_INTERVAL_SECONDS,
+    primaryLabelInterval: TIME_AXIS_INTERVAL_SECONDS,
+    formatTimeCallback: (seconds: number) => {
+        const mins = Math.floor(seconds / SECONDS_PER_MINUTE);
+        const secs = Math.floor(seconds % SECONDS_PER_MINUTE);
+        return `${mins}:${secs.toString().padStart(TIMESTAMP_SECONDS_PAD_LENGTH, TIMESTAMP_SECONDS_PAD_CHAR)}`;
+    },
+    style: {
+        fontSize: String(theme.typography.body2.fontSize),
+        background: theme.palette.background.default,
+        color: theme.palette.text.secondary,
+    },
+});
+
+export const createWaveSurferPlugins = ({
+    containerHeight,
+    maxFrequencyHz,
+    theme
+}: {
+    containerHeight: number;
+    maxFrequencyHz: number;
+    theme: Theme
+}) => {
+    const spectrogramPlugin = WindowedSpectrogramPlugin.create(
+        createSpectrogramOptions(containerHeight, maxFrequencyHz)
+    );
+    forceSpectrogramSegmentRendering(spectrogramPlugin);
+
+    const timeLinePlugin = TimelinePlugin.create(
+        createTimelinePluginOptions(theme)
+    );
+    renderEveryTimeLabel(timeLinePlugin);
+
+    return {
+        spectrogramPlugin,
+        plugins: [spectrogramPlugin, timeLinePlugin]
+    };
+};
