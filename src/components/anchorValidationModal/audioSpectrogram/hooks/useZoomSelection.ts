@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import type { AudioSpectrogramViewerProps } from '../types/audioSpectrogram.types';
+import type { ZoomSelectionContext } from '../types/audioSpectrogram.types';
 import { useDragSelection } from './useDragSelection';
 import { useWheelScroll } from './useWheelScroll';
 import { useMassiviAppStore } from '../../../../store/useStore';
@@ -11,7 +11,7 @@ export const useZoomSelection = ({
   spectrogramPlotType,
   isReadyAudio,
   applyZoomView,
-}: AudioSpectrogramViewerProps) => {
+}: ZoomSelectionContext) => {
   const spectrogramContainer = spectrogramContainerRef.current;
   const initialView = initialViewRef.current;
 

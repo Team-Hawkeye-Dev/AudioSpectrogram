@@ -11,17 +11,36 @@ export const AudioSpectrogramSourcePlot = ({
     stepHz
 }: AudioSpectrogramSource) => {
     const { audioUrl } = useAudioSpectrogramUrl(audioGuid, spectrogramType)
-    const viewer = useAudioSpectrogramViewer(audioUrl, maxHz, spectrogramType)
-    const zoom = useZoomSelection(viewer)
+    const {
+        spectrogramContainerRef,
+        waveSurferInstanceRef,
+        initialViewRef,
+        spectrogramPlotType,
+        isReadyAudio,
+        applyZoomView,
+        isPlaying,
+        togglePlay,
+        playbackPosition,
+    } = useAudioSpectrogramViewer(audioUrl, maxHz, spectrogramType)
+
+    const zoom = useZoomSelection({
+        spectrogramContainerRef,
+        waveSurferInstanceRef,
+        initialViewRef,
+        spectrogramPlotType,
+        isReadyAudio,
+        applyZoomView,
+    })
 
     if (!audioUrl) return null
     return (
         <AudioSpectrogramViewer
             maxHz={maxHz}
             stepHz={stepHz}
-            spectrogramContainerRef={viewer.spectrogramContainerRef}
-            isReadyAudio={viewer.isReadyAudio}
+            spectrogramContainerRef={spectrogramContainerRef}
+            isReadyAudio={isReadyAudio}
             zoom={zoom}
+            playback={{ isPlaying, togglePlay, playbackPosition }}
         />
     )
 }
