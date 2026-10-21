@@ -27,3 +27,17 @@ export const ZoomSelectionHighlight = styled(Box)(({theme}) => ({
     pointerEvents: 'none',
     zIndex: theme.zIndex.appBar
 }))
+
+export const ProgressTimeTooltip = styled(Box)(({theme}) => ({
+    position: 'absolute',
+    top: theme.spacing(0.5),
+    transform: 'translateX(-50%)',
+    padding: theme.spacing(0.25, 0.75),
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.black, 0.75),
+    color: theme.palette.common.white,
+    fontSize: theme.typography.caption.fontSize,
+    whiteSpace: 'nowrap',
+    pointerEvents: 'none',
+    zIndex: theme.zIndex.tooltip
+}))

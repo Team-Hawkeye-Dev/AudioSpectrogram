@@ -6,6 +6,8 @@ import TimelinePlugin, { type TimelinePluginOptions } from "wavesurfer.js/dist/p
 import {
     DECODE_SAMPLE_RATE_HZ,
     FREQUENCY_MIN_HZ,
+    PROGRESS_LINE_COLOR,
+    PROGRESS_LINE_WIDTH_PX,
     SECONDS_PER_MINUTE,
     SPECTROGRAM_COLOR_MAP,
     SPECTROGRAM_FFT_SAMPLES,
@@ -23,7 +25,9 @@ export const DEFAULT_WAVESURFER_OPTIONS = {
     dragToSeek: false,
     autoScroll: true,
     autoCenter: false,
-    hideScrollbar: true
+    hideScrollbar: true,
+    cursorColor: PROGRESS_LINE_COLOR,
+    cursorWidth: PROGRESS_LINE_WIDTH_PX
 };
 
 const createSpectrogramOptions = (containerHeight: number, maxFrequencyHz: number): WindowedSpectrogramPluginOptions => ({

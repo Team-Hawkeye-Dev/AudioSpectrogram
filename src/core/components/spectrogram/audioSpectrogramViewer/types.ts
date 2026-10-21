@@ -13,10 +13,22 @@ export interface AudioSpectrogramZoomControls {
     resetZoom: () => void;
 }
 
+export interface PlaybackPosition {
+    currentTime: number;
+    progressLinePx: number;
+}
+
+export interface AudioSpectrogramPlaybackControls {
+    isPlaying: boolean;
+    togglePlay: () => void;
+    playbackPosition: PlaybackPosition;
+}
+
 export interface AudioSpectrogramViewerProps {
     maxHz: number;
     stepHz: number;
     spectrogramContainerRef: RefObject<HTMLDivElement | null>;
     zoom: AudioSpectrogramZoomControls;
+    playback: AudioSpectrogramPlaybackControls;
     isReadyAudio: boolean;
 }

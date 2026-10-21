@@ -1,7 +1,7 @@
 import { useCallback, useState, useRef, type PointerEvent } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 import { useSnackbar } from 'notistack';
-import { CONTAINER_CENTER_RATIO, DRAG_ZOOM_OUT_FACTOR, MAX_ZOOM_CANVAS_PX, MAX_ZOOM_VISIBLE_SECONDS, MIN_ZOOM_SELECTION_PX } from '../consts/audioSpectrogram.consts';
+import { CLICK_MAX_DRAG_PX, CONTAINER_CENTER_RATIO, DRAG_ZOOM_OUT_FACTOR, MAX_ZOOM_CANVAS_PX, MAX_ZOOM_VISIBLE_SECONDS, MIN_ZOOM_SELECTION_PX } from '../consts/audioSpectrogram.consts';
 import type { SpectrogramInteractionContext } from '../types/audioSpectrogram.types';
 import { useMassiviAppStore } from '../../../../store/useStore';
 
@@ -120,6 +120,11 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
        const dragPx = endPx - startPx
        const width = spectrogramContainer.clientWidth;
 
+       const isClick = Math.abs(dragPx) <= CLICK_MAX_DRAG_PX
+       if (isClick) {
+        waveSurfer.setTime(Math.min(audioDuration, pixelToTimeInSeconds(waveSurfer, endPx)))
+        return
+       }
        if (dragPx < 0) {
         zoomOutFromLeftDrag(waveSurfer, width)
         return
