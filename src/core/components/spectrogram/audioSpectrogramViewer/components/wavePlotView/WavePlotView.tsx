@@ -22,7 +22,7 @@ export const WavePlotView = ({
 }: WavePlotViewProps) => {
   const { selection, onDragStart, onDragMove, onDragEnd } = zoom;
   const zoomSelection = selection ? getZoomSelection(selection) : null;
-  const { isPlaying, playbackPosition } = playback;
+  const { playbackPosition } = playback;
 
   return (
     <WavePlotContainer>
@@ -40,11 +40,9 @@ export const WavePlotView = ({
             }}
           />
         )}
-        {isPlaying && (
-          <ProgressTimeTooltip style={{ left: playbackPosition.progressLinePx }}>
-            {timeFormat(playbackPosition.currentTime)}
-          </ProgressTimeTooltip>
-        )}
+        <ProgressTimeTooltip style={{ left: playbackPosition.progressLinePx }}>
+          {timeFormat(playbackPosition.currentTime)}
+        </ProgressTimeTooltip>
       </WavePlotWrapper>
     </WavePlotContainer>
   );
