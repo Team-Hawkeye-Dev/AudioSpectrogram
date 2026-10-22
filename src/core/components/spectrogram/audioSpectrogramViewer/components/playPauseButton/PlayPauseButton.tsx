@@ -13,7 +13,6 @@ export const PlayPauseButton = ({ playback, isReadyAudio }: PlayPauseButtonProps
         onClick={playback.togglePlay}
         disabled={!isReadyAudio}
         size="small"
-        aria-label={playback.isPlaying ? "Pause" : "Play"}
     >
         {playback.isPlaying ? <PauseIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
     </PlayPauseIconButton>

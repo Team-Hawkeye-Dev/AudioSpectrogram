@@ -17,6 +17,7 @@ import {
     TIMESTAMP_SECONDS_PAD_LENGTH,
 } from "./audioSpectrogram.consts";
 import { forceSpectrogramSegmentRendering, renderEveryTimeLabel } from "../utils/spectrogramActions";
+import { timeFormat } from "../../../../core/components/spectrogram/audioSpectrogramViewer/utils/formatPlaybackTime";
 
 export const DEFAULT_WAVESURFER_OPTIONS = {
     height: 0,
@@ -45,11 +46,7 @@ const createTimelinePluginOptions = (theme: Theme): TimelinePluginOptions => ({
     height: TIME_AXIS_HEIGHT_PX,
     timeInterval: TIME_AXIS_INTERVAL_SECONDS,
     primaryLabelInterval: TIME_AXIS_INTERVAL_SECONDS,
-    formatTimeCallback: (seconds: number) => {
-        const mins = Math.floor(seconds / SECONDS_PER_MINUTE);
-        const secs = Math.floor(seconds % SECONDS_PER_MINUTE);
-        return `${mins}:${secs.toString().padStart(TIMESTAMP_SECONDS_PAD_LENGTH, TIMESTAMP_SECONDS_PAD_CHAR)}`;
-    },
+    formatTimeCallback: timeFormat,
     style: {
         fontSize: String(theme.typography.body2.fontSize),
         background: theme.palette.background.default,

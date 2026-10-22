@@ -1,6 +1,6 @@
 import type { RefObject } from "react";
 import type { AudioSpectrogramPlaybackControls, AudioSpectrogramZoomControls } from "../../types";
-import { formatPlaybackTime } from "../../utils/formatPlaybackTime";
+import { timeFormat } from "../../utils/formatPlaybackTime";
 import { getZoomSelection } from "../../utils/selectionHighlight";
 import {
   ProgressTimeTooltip,
@@ -42,7 +42,7 @@ export const WavePlotView = ({
         )}
         {isPlaying && (
           <ProgressTimeTooltip style={{ left: playbackPosition.progressLinePx }}>
-            {formatPlaybackTime(playbackPosition.currentTime)}
+            {timeFormat(playbackPosition.currentTime)}
           </ProgressTimeTooltip>
         )}
       </WavePlotWrapper>
