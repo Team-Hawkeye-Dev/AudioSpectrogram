@@ -19,7 +19,7 @@ export interface AudioSpectrogramViewerProps {
   spectrogramContainerRef: RefObject<HTMLDivElement | null>;
   waveSurferInstanceRef: RefObject<WaveSurfer | null>;
   initialViewRef: RefObject<InitialView | null>;
-    spectrogramPlotType: SpectrogramType;
+  spectrogramPlotType: SpectrogramType;
   isReadyAudio: boolean;
   isPlaying: boolean;
   togglePlay: () => void;

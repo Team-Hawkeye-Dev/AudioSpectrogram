@@ -1,3 +1,4 @@
+import type { PlaybackPosition } from "../../../../core/components/spectrogram/audioSpectrogramViewer/types";
 import type { SpectrogramWindow } from "../../../../store/slices/anchorValidationSectionSlice";
 
 export const VISIBLE_WINDOW_SECONDS = 90;
@@ -29,7 +30,6 @@ export const TOP_SPECTROGRAM_STEP_HZ = 500;
 export const BOTTOM_SPECTROGRAM_STEP_HZ = 1000;
 
 export const SPECTROGRAM_COLOR_MAP = 'roseus';
-
 export const PROGRESS_LINE_COLOR = '#F28918';
 export const PROGRESS_LINE_WIDTH_PX = 2;
 
@@ -37,6 +37,8 @@ export const SpectrogramType = {
     TOP: 'top',
     BOTTOM: 'bottom'
 } as const;
+
+export const INITIAL_PLAYBACK_POSITION: PlaybackPosition = { currentTime: 0, progressLinePx: 0 };
 
 export type SpectrogramType = (typeof SpectrogramType)[keyof typeof SpectrogramType];
 

@@ -4,6 +4,7 @@ import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogr
 import { useTheme } from '@mui/material/styles';
 import {
   DEFAULT_INITIAL_SCROLL_TIME,
+  INITIAL_PLAYBACK_POSITION,
   TIME_AXIS_HEIGHT_PX,
   VISIBLE_WINDOW_SECONDS,
   type SpectrogramType,
@@ -13,8 +14,6 @@ import type { AudioSpectrogramViewerProps, InitialView } from '../types/audioSpe
 import { onSpectrogramPlayback, onSpectrogramReady, rerenderSpectrogramAtZoom } from '../utils/spectrogramActions';
 import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 import { useMassiviAppStore } from '../../../../store/useStore';
-
-const INITIAL_PLAYBACK_POSITION: PlaybackPosition = { currentTime: 0, progressLinePx: 0 };
 
 export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequencyHz: number, spectrogramPlotType: SpectrogramType): AudioSpectrogramViewerProps => {
   const theme = useTheme();
