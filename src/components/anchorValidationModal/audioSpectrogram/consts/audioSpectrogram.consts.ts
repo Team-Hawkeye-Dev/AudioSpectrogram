@@ -5,10 +5,6 @@ export const VISIBLE_WINDOW_SECONDS = 90;
 
 export const DEFAULT_INITIAL_SCROLL_TIME = 0;
 
-export const SECONDS_PER_MINUTE = 60;
-export const TIMESTAMP_SECONDS_PAD_LENGTH = 2;
-export const TIMESTAMP_SECONDS_PAD_CHAR = '0';
-
 export const DRAG_ZOOM_OUT_FACTOR = 2;
 export const CONTAINER_CENTER_RATIO = 0.5;
 export const MIN_ZOOM_SELECTION_PX = 50;

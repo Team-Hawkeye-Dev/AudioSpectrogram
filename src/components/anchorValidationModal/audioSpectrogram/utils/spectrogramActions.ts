@@ -68,10 +68,9 @@ export const onSpectrogramPlayback = (
 ) => {
   const updatePlaybackPosition = () => {
     const currentTime = waveSurfer.getCurrentTime()
-    setPlaybackPosition({
-      currentTime,
-      progressLinePx: currentTime * waveSurfer.options.minPxPerSec - waveSurfer.getScroll(),
-    })
+    const progressLineOffsetPx = currentTime * waveSurfer.options.minPxPerSec
+    const progressLinePx = progressLineOffsetPx - waveSurfer.getScroll()
+    setPlaybackPosition({ currentTime, progressLinePx })
   }
 
   waveSurfer.on('play', () => setIsPlaying(true))

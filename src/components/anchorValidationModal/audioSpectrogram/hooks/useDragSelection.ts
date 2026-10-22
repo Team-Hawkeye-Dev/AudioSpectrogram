@@ -122,7 +122,9 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
 
        const isClick = Math.abs(dragPx) <= CLICK_MAX_DRAG_PX
        if (isClick) {
-        waveSurfer.setTime(Math.min(audioDuration, pixelToTimeInSeconds(waveSurfer, endPx)))
+        const clickedTime = pixelToTimeInSeconds(waveSurfer, endPx)
+        const seekTime = Math.min(audioDuration, clickedTime)
+        waveSurfer.setTime(seekTime)
         return
        }
        if (dragPx < 0) {

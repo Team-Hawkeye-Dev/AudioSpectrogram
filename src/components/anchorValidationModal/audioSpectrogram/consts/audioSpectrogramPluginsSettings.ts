@@ -8,13 +8,10 @@ import {
     FREQUENCY_MIN_HZ,
     PROGRESS_LINE_COLOR,
     PROGRESS_LINE_WIDTH_PX,
-    SECONDS_PER_MINUTE,
     SPECTROGRAM_COLOR_MAP,
     SPECTROGRAM_FFT_SAMPLES,
     TIME_AXIS_HEIGHT_PX,
     TIME_AXIS_INTERVAL_SECONDS,
-    TIMESTAMP_SECONDS_PAD_CHAR,
-    TIMESTAMP_SECONDS_PAD_LENGTH,
 } from "./audioSpectrogram.consts";
 import { forceSpectrogramSegmentRendering, renderEveryTimeLabel } from "../utils/spectrogramActions";
 import { timeFormat } from "../../../../core/components/spectrogram/audioSpectrogramViewer/utils/formatPlaybackTime";
