@@ -2,6 +2,7 @@ import type { MutableRefObject, RefObject } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogram-windowed.js';
 import type TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.js';
+import type { Region } from 'wavesurfer.js/dist/plugins/regions.js';
 import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 
 export const onSpectrogramReady = (
@@ -82,4 +83,12 @@ export const onSpectrogramPlayback = (
   waveSurfer.on('timeupdate', updatePlaybackPosition)
   waveSurfer.on('scroll', updatePlaybackPosition)
   waveSurfer.on('zoom', updatePlaybackPosition)
+}
+
+export const scrollRegionIntoView = (waveSurfer: WaveSurfer, region: Region, containerWidthPx: number) => {
+  const { minPxPerSec } = waveSurfer.options
+  const visibleStartTime = waveSurfer.getScroll() / minPxPerSec
+  const visibleEndTime = visibleStartTime + containerWidthPx / minPxPerSec
+  const isRegionVisible = region.start >= visibleStartTime && region.end <= visibleEndTime
+  if (!isRegionVisible) waveSurfer.setScrollTime(region.start)
 }

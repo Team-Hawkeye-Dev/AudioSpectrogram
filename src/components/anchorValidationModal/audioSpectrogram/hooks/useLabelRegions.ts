@@ -1,82 +1,125 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { alpha, useTheme } from '@mui/material/styles';
+import { useSnackbar } from 'notistack';
 import type { Region } from 'wavesurfer.js/dist/plugins/regions.js';
-import { MIDDLE_MOUSE_BUTTON, SPECTROGRAM_LABELS } from '../consts/audioSpectrogram.consts';
+import { SPECTROGRAM_LABELS } from '../consts/audioSpectrogram.consts';
 import type { UseLabelRegionsProps } from '../types/audioSpectrogram.types';
+import type { AudioSpectrogramDetectionControls } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
+import { onWaveSurferPlay, scrollRegionIntoView } from '../utils/spectrogramActions';
 
-
+// Shows the labels (detections) as regions. Moving between detections plays only that part of the audio
+// on its own audio element, so the progress line stays where it is
 export const useLabelRegions = ({
+  spectrogramContainerRef,
   waveSurferInstanceRef,
   regionsPluginRef,
   audioUrl,
   spectrogramPlotType,
   isReadyAudio,
-}: UseLabelRegionsProps) => {
+}: UseLabelRegionsProps): AudioSpectrogramDetectionControls => {
   const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
+  const labelAudioRef = useRef<HTMLAudioElement | null>(null);
+  const labelsRef = useRef<Region[]>([]);
   const playingShadeRef = useRef<Region | null>(null);
-  const animationFrameRef = useRef(0);
+  const detectionIndexRef = useRef<number | null>(null);
+
+  const stopLabelAudio = useCallback(() => {
+    labelAudioRef.current?.pause();
+    playingShadeRef.current?.remove();
+    playingShadeRef.current = null;
+  }, []);
+
+  const playLabelAudio = useCallback(async (label: Region) => {
+    const waveSurfer = waveSurferInstanceRef.current;
+    const regionsPlugin = regionsPluginRef.current;
+    const labelAudio = labelAudioRef.current;
+    if (!waveSurfer || !regionsPlugin || !labelAudio) return;
+
+    stopLabelAudio();
+    waveSurfer.pause();
+    scrollRegionIntoView(waveSurfer, label, spectrogramContainerRef.current?.clientWidth ?? 0);
+    labelAudio.currentTime = label.start;
+    await labelAudio.play();
+
+    const playingShade = regionsPlugin.addRegion({
+      start: label.start,
+      end: label.end,
+      color: alpha(theme.palette.success.light, 0.45),
+      drag: false,
+      resize: false,
+    });
+    playingShadeRef.current = playingShade;
+
+    // Reveals the shade from left to right over the label duration
+    const sweep = playingShade.element?.animate(
+      [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }],
+      { duration: (label.end - label.start) * 1000, easing: 'linear' },
+    );
+    await sweep?.finished;
+
+    const isStillPlayingThisLabel = playingShadeRef.current === playingShade;
+    if (isStillPlayingThisLabel) stopLabelAudio();
+  }, [theme, stopLabelAudio, waveSurferInstanceRef, regionsPluginRef, spectrogramContainerRef]);
 
   useEffect(() => {
     const waveSurfer = waveSurferInstanceRef.current;
     const regionsPlugin = regionsPluginRef.current;
     if (!isReadyAudio || !waveSurfer || !regionsPlugin || !audioUrl) return;
 
-    const labelAudio = new Audio(audioUrl);
-    const labelColor = alpha(theme.palette.success.main, 0.3);
-    const playingShadeColor = alpha(theme.palette.success.light, 0.45);
+    labelAudioRef.current = new Audio(audioUrl);
+    labelsRef.current = SPECTROGRAM_LABELS[spectrogramPlotType]
+      .toSorted((first, second) => first.startTime - second.startTime)
+      .map(({ startTime, endTime }) =>
+        regionsPlugin.addRegion({
+          start: startTime,
+          end: endTime,
+          color: alpha(theme.palette.success.main, 0.3),
+          drag: false,
+          resize: false,
+        }),
+      );
 
-    const stopLabelAudio = () => {
-      cancelAnimationFrame(animationFrameRef.current);
-      labelAudio.pause();
-      playingShadeRef.current?.remove();
-      playingShadeRef.current = null;
-    };
-
-    const growPlayingShade = (label: Region) => {
-      if (labelAudio.currentTime >= label.end) {
-        stopLabelAudio();
-        return;
-      }
-      playingShadeRef.current?.setOptions({ end: labelAudio.currentTime, color: playingShadeColor });
-      animationFrameRef.current = requestAnimationFrame(() => growPlayingShade(label));
-    };
-
-    const playLabelAudio = async (label: Region) => {
-      stopLabelAudio();
-      waveSurfer.pause();
-      labelAudio.currentTime = label.start;
-      await labelAudio.play();
-      playingShadeRef.current = regionsPlugin.addRegion({
-        start: label.start,
-        end: label.start,
-        color: playingShadeColor,
-        drag: false,
-        resize: false,
-      });
-      growPlayingShade(label);
-    };
-
-    SPECTROGRAM_LABELS[spectrogramPlotType].forEach(({ startTime, endTime }) => {
-      const label = regionsPlugin.addRegion({
-        start: startTime,
-        end: endTime,
-        color: labelColor,
-        drag: false,
-        resize: false,
-      });
-      label.element?.addEventListener('mousedown', (event) => {
-        if (event.button !== MIDDLE_MOUSE_BUTTON) return;
-        event.preventDefault();
-        void playLabelAudio(label);
-      });
-    });
-
-    const unsubscribeFromPlay = waveSurfer.on('play', stopLabelAudio);
+    const unsubscribeFromPlay = onWaveSurferPlay(waveSurfer, stopLabelAudio);
 
     return () => {
       unsubscribeFromPlay();
       stopLabelAudio();
       regionsPlugin.clearRegions();
+      labelsRef.current = [];
+      labelAudioRef.current = null;
+      detectionIndexRef.current = null;
     };
-  }, [isReadyAudio, audioUrl, spectrogramPlotType, theme, waveSurferInstanceRef, regionsPluginRef]);
+  }, [isReadyAudio, audioUrl, spectrogramPlotType, theme, stopLabelAudio, waveSurferInstanceRef, regionsPluginRef]);
+
+  const goToDetection = useCallback((detectionIndex: number) => {
+    const label = labelsRef.current[detectionIndex];
+    if (!label) return;
+    detectionIndexRef.current = detectionIndex;
+    void playLabelAudio(label);
+  }, [playLabelAudio]);
+
+  const goToFirstDetection = useCallback(() => goToDetection(0), [goToDetection]);
+
+  const goToNextDetection = useCallback(() => {
+    const nextIndex = (detectionIndexRef.current ?? -1) + 1;
+    const isAfterLastDetection = nextIndex >= labelsRef.current.length;
+    if (isAfterLastDetection) {
+      enqueueSnackbar('This is the last detection', { variant: 'info', preventDuplicate: true });
+      return;
+    }
+    goToDetection(nextIndex);
+  }, [goToDetection, enqueueSnackbar]);
+
+  const goToPreviousDetection = useCallback(() => {
+    const previousIndex = (detectionIndexRef.current ?? 0) - 1;
+    const isBeforeFirstDetection = previousIndex < 0;
+    if (isBeforeFirstDetection) {
+      enqueueSnackbar('This is the first detection', { variant: 'info', preventDuplicate: true });
+      return;
+    }
+    goToDetection(previousIndex);
+  }, [goToDetection, enqueueSnackbar]);
+
+  return { goToFirstDetection, goToPreviousDetection, goToNextDetection };
 };

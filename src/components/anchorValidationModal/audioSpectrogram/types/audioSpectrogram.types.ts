@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 import type RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
 import type { SpectrogramType } from '../consts/audioSpectrogram.consts';
-import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
+import type { AudioSpectrogramDetectionControls, PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 
 export interface InitialView {
   minPxPerSec: number;
@@ -25,14 +25,16 @@ export interface AudioSpectrogramViewerProps {
   isPlaying: boolean;
   togglePlay: () => void;
   playbackPosition: PlaybackPosition;
+  detections: AudioSpectrogramDetectionControls;
   applyZoomView: (view: InitialView, keepAutoScroll: boolean) => void;
 }
 
-export type ZoomSelectionContext = Omit<AudioSpectrogramViewerProps, 'isPlaying' | 'togglePlay' | 'playbackPosition'>;
+export type ZoomSelectionContext = Omit<AudioSpectrogramViewerProps, 'isPlaying' | 'togglePlay' | 'playbackPosition' | 'detections'>;
 
 export type SpectrogramInteractionContext = Omit<ZoomSelectionContext, 'initialViewRef' | 'applyZoomView'>;
 
 export interface UseLabelRegionsProps {
+  spectrogramContainerRef: RefObject<HTMLDivElement | null>;
   waveSurferInstanceRef: RefObject<WaveSurfer | null>;
   regionsPluginRef: RefObject<RegionsPlugin | null>;
   audioUrl: string | undefined;

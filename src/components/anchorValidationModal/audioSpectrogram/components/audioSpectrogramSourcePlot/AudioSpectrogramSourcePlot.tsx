@@ -21,6 +21,7 @@ export const AudioSpectrogramSourcePlot = ({
         isPlaying,
         togglePlay,
         playbackPosition,
+        detections,
     } = useAudioSpectrogramViewer(audioUrl, maxHz, spectrogramType)
 
     const zoom = useZoomSelection({
@@ -41,6 +42,7 @@ export const AudioSpectrogramSourcePlot = ({
             isReadyAudio={isReadyAudio}
             zoom={zoom}
             playback={{ isPlaying, togglePlay, playbackPosition }}
+            detections={detections}
         />
     )
 }

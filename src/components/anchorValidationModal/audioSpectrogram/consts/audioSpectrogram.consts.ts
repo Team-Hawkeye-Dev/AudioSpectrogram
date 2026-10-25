@@ -46,7 +46,6 @@ export const SPECTROGRAM_LABELS: Record<SpectrogramType, SoundLabel[]> = {
     [SpectrogramType.BOTTOM]: BOTTOM_DEMO_LABELS
 };
 
-export const MIDDLE_MOUSE_BUTTON = 1;
 
 const DEFAULT_SPECTROGRAM_WINDOW: SpectrogramWindow = {
     currentStartTime: 0,

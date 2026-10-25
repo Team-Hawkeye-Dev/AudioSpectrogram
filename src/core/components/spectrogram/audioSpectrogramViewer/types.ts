@@ -24,11 +24,18 @@ export interface AudioSpectrogramPlaybackControls {
     playbackPosition: PlaybackPosition;
 }
 
+export interface AudioSpectrogramDetectionControls {
+    goToFirstDetection: () => void;
+    goToPreviousDetection: () => void;
+    goToNextDetection: () => void;
+}
+
 export interface AudioSpectrogramViewerProps {
     maxHz: number;
     stepHz: number;
     spectrogramContainerRef: RefObject<HTMLDivElement | null>;
     zoom: AudioSpectrogramZoomControls;
     playback: AudioSpectrogramPlaybackControls;
+    detections: AudioSpectrogramDetectionControls;
     isReadyAudio: boolean;
 }

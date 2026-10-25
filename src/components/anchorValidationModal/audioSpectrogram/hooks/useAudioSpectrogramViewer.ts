@@ -122,7 +122,8 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
     void waveSurferInstanceRef.current?.playPause()
   }, []);
 
-  useLabelRegions({
+  const detections = useLabelRegions({
+    spectrogramContainerRef,
     waveSurferInstanceRef,
     regionsPluginRef,
     audioUrl,
@@ -139,6 +140,7 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
     isPlaying,
     togglePlay,
     playbackPosition,
+    detections,
     applyZoomView,
   };
 };
