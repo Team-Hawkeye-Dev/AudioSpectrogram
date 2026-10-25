@@ -1,5 +1,5 @@
 import { FrequencyLabels } from "./components/frequencyLabels/FrequencyLabels";
-import { ResetZoomButtonRow } from "./components/resetZoomButtonRow/ResetZoomButtonRow";
+import { SpectrogramControlsRow } from "./components/spectrogramControlsRow/SpectrogramControlsRow";
 import { WavePlotView } from "./components/wavePlotView/WavePlotView";
 import {
   SpectrogramPlotRow,
@@ -13,15 +13,16 @@ export const AudioSpectrogramViewer = ({
   stepHz,
   spectrogramContainerRef,
   zoom,
+  playback,
   isReadyAudio,
 }: AudioSpectrogramViewerProps) => (
   <SpectrogramViewerRootContainer>
     <SpectrogramRowContainer>
       <SpectrogramPlotRow>
         <FrequencyLabels maxHz={maxHz} stepHz={stepHz} />
-        <WavePlotView spectrogramContainerRef={spectrogramContainerRef} zoom={zoom} />
+        <WavePlotView spectrogramContainerRef={spectrogramContainerRef} zoom={zoom} playback={playback} />
       </SpectrogramPlotRow>
-      <ResetZoomButtonRow zoom={zoom} isReadyAudio={isReadyAudio} />
+      <SpectrogramControlsRow zoom={zoom} playback={playback} isReadyAudio={isReadyAudio} />
     </SpectrogramRowContainer>
   </SpectrogramViewerRootContainer>
 );

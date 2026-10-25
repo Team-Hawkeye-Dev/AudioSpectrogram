@@ -6,15 +6,15 @@ import TimelinePlugin, { type TimelinePluginOptions } from "wavesurfer.js/dist/p
 import {
     DECODE_SAMPLE_RATE_HZ,
     FREQUENCY_MIN_HZ,
-    SECONDS_PER_MINUTE,
+    PROGRESS_LINE_COLOR,
+    PROGRESS_LINE_WIDTH_PX,
     SPECTROGRAM_COLOR_MAP,
     SPECTROGRAM_FFT_SAMPLES,
     TIME_AXIS_HEIGHT_PX,
     TIME_AXIS_INTERVAL_SECONDS,
-    TIMESTAMP_SECONDS_PAD_CHAR,
-    TIMESTAMP_SECONDS_PAD_LENGTH,
 } from "./audioSpectrogram.consts";
 import { forceSpectrogramSegmentRendering, renderEveryTimeLabel } from "../utils/spectrogramActions";
+import { timeFormat } from "../../../../core/components/spectrogram/audioSpectrogramViewer/utils/formatPlaybackTime";
 
 export const DEFAULT_WAVESURFER_OPTIONS = {
     height: 0,
@@ -23,7 +23,9 @@ export const DEFAULT_WAVESURFER_OPTIONS = {
     dragToSeek: false,
     autoScroll: true,
     autoCenter: false,
-    hideScrollbar: true
+    hideScrollbar: true,
+    cursorColor: PROGRESS_LINE_COLOR,
+    cursorWidth: PROGRESS_LINE_WIDTH_PX
 };
 
 const createSpectrogramOptions = (containerHeight: number, maxFrequencyHz: number): WindowedSpectrogramPluginOptions => ({
@@ -41,11 +43,7 @@ const createTimelinePluginOptions = (theme: Theme): TimelinePluginOptions => ({
     height: TIME_AXIS_HEIGHT_PX,
     timeInterval: TIME_AXIS_INTERVAL_SECONDS,
     primaryLabelInterval: TIME_AXIS_INTERVAL_SECONDS,
-    formatTimeCallback: (seconds: number) => {
-        const mins = Math.floor(seconds / SECONDS_PER_MINUTE);
-        const secs = Math.floor(seconds % SECONDS_PER_MINUTE);
-        return `${mins}:${secs.toString().padStart(TIMESTAMP_SECONDS_PAD_LENGTH, TIMESTAMP_SECONDS_PAD_CHAR)}`;
-    },
+    formatTimeCallback: timeFormat,
     style: {
         fontSize: String(theme.typography.body2.fontSize),
         background: theme.palette.background.default,

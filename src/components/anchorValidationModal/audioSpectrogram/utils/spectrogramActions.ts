@@ -2,6 +2,7 @@ import type { MutableRefObject, RefObject } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogram-windowed.js';
 import type TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.js';
+import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 
 export const onSpectrogramReady = (
   waveSurferInstanceRef: MutableRefObject<WaveSurfer | null>,
@@ -58,4 +59,24 @@ export const renderEveryTimeLabel = (timeLinePlugin: TimelinePlugin) => {
     timeLine.appendChild(notch)
   }
   timeLinePlugin['updateVisibleNotches'] = () => {}
+}
+
+export const onSpectrogramPlayback = (
+  waveSurfer: WaveSurfer,
+  setIsPlaying: (isPlaying: boolean) => void,
+  setPlaybackPosition: (playbackPosition: PlaybackPosition) => void,
+) => {
+  const updatePlaybackPosition = () => {
+    const currentTime = waveSurfer.getCurrentTime()
+    const progressLineOffsetPx = currentTime * waveSurfer.options.minPxPerSec
+    const progressLinePx = progressLineOffsetPx - waveSurfer.getScroll()
+    setPlaybackPosition({ currentTime, progressLinePx })
+  }
+
+  waveSurfer.on('play', () => setIsPlaying(true))
+  waveSurfer.on('pause', () => setIsPlaying(false))
+  waveSurfer.on('finish', () => setIsPlaying(false))
+  waveSurfer.on('timeupdate', updatePlaybackPosition)
+  waveSurfer.on('scroll', updatePlaybackPosition)
+  waveSurfer.on('zoom', updatePlaybackPosition)
 }

@@ -25,7 +25,7 @@ export const SpectrogramContainer = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   flex: 3,
   backgroundColor: theme.palette.background.paper,
-  overflow: "auto",
+  overflow: "hidden",
 }));
 
 export const ReportColumn = styled(Box)(() => ({

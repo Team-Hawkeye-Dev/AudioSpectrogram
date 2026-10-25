@@ -4,13 +4,15 @@ import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogr
 import { useTheme } from '@mui/material/styles';
 import {
   DEFAULT_INITIAL_SCROLL_TIME,
+  INITIAL_PLAYBACK_POSITION,
   TIME_AXIS_HEIGHT_PX,
   VISIBLE_WINDOW_SECONDS,
   type SpectrogramType,
 } from '../consts/audioSpectrogram.consts';
 import { createWaveSurferPlugins, DEFAULT_WAVESURFER_OPTIONS } from '../consts/audioSpectrogramPluginsSettings';
 import type { AudioSpectrogramViewerProps, InitialView } from '../types/audioSpectrogram.types';
-import { onSpectrogramReady, rerenderSpectrogramAtZoom } from '../utils/spectrogramActions';
+import { onSpectrogramPlayback, onSpectrogramReady, rerenderSpectrogramAtZoom } from '../utils/spectrogramActions';
+import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 import { useMassiviAppStore } from '../../../../store/useStore';
 
 export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequencyHz: number, spectrogramPlotType: SpectrogramType): AudioSpectrogramViewerProps => {
@@ -24,6 +26,8 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
   const setSpectrogramWindow = useMassiviAppStore((state) => state.anchorValidationSection.setSpectrogramWindow)
 
   const [isReadyAudio, setIsReadyAudio] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackPosition, setPlaybackPosition] = useState<PlaybackPosition>(INITIAL_PLAYBACK_POSITION);
 
   const setAudioDuration = useCallback(
     (audioDuration: number) => setSpectrogramAudioDuration(spectrogramPlotType, audioDuration),
@@ -92,6 +96,8 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
       plugins,
     });
 
+    onSpectrogramPlayback(waveSurfer, setIsPlaying, setPlaybackPosition);
+
     const cleanupSpectrogram = onSpectrogramReady(
       waveSurferInstanceRef,
       waveSurfer,
@@ -102,8 +108,14 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
     return () => {
       cleanupSpectrogram()
       spectrogramPluginRef.current = null
+      setIsPlaying(false)
+      setPlaybackPosition(INITIAL_PLAYBACK_POSITION)
     }
   }, [audioUrl, maxFrequencyHz, theme, spectrogramPlotType, setAudioDuration, setSpectrogramWindow, fitViewToShortAudio]);
+
+  const togglePlay = () => {
+    void waveSurferInstanceRef.current?.playPause();
+  };
 
   return {
     spectrogramContainerRef,
@@ -111,6 +123,9 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
     initialViewRef,
     spectrogramPlotType,
     isReadyAudio,
+    isPlaying,
+    togglePlay,
+    playbackPosition,
     applyZoomView,
   };
 };
