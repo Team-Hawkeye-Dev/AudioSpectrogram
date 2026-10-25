@@ -113,9 +113,9 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
     }
   }, [audioUrl, maxFrequencyHz, theme, spectrogramPlotType, setAudioDuration, setSpectrogramWindow, fitViewToShortAudio]);
 
-  const togglePlay = useCallback(() => {
-    void waveSurferInstanceRef.current?.playPause()
-  }, []);
+  const togglePlay = () => {
+    void waveSurferInstanceRef.current?.playPause();
+  };
 
   return {
     spectrogramContainerRef,
