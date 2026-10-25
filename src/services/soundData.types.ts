@@ -5,3 +5,8 @@ export interface SoundSession {
 export interface SoundDataResponse {
   sessions: SoundSession[];
 }
+
+export interface SoundLabel {
+  startTime: number;
+  endTime: number;
+}

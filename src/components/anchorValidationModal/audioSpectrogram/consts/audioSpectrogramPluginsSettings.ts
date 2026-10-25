@@ -3,6 +3,7 @@ import WindowedSpectrogramPlugin, {
     type WindowedSpectrogramPluginOptions,
 } from "wavesurfer.js/dist/plugins/spectrogram-windowed.js";
 import TimelinePlugin, { type TimelinePluginOptions } from "wavesurfer.js/dist/plugins/timeline.js";
+import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.js";
 import {
     DECODE_SAMPLE_RATE_HZ,
     FREQUENCY_MIN_HZ,
@@ -70,8 +71,11 @@ export const createWaveSurferPlugins = ({
     );
     renderEveryTimeLabel(timeLinePlugin);
 
+    const regionsPlugin = RegionsPlugin.create();
+
     return {
         spectrogramPlugin,
-        plugins: [spectrogramPlugin, timeLinePlugin]
+        regionsPlugin,
+        plugins: [spectrogramPlugin, timeLinePlugin, regionsPlugin]
     };
 };

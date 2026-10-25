@@ -1,5 +1,6 @@
 import type { RefObject } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
+import type RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
 import type { SpectrogramType } from '../consts/audioSpectrogram.consts';
 import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 
@@ -30,3 +31,11 @@ export interface AudioSpectrogramViewerProps {
 export type ZoomSelectionContext = Omit<AudioSpectrogramViewerProps, 'isPlaying' | 'togglePlay' | 'playbackPosition'>;
 
 export type SpectrogramInteractionContext = Omit<ZoomSelectionContext, 'initialViewRef' | 'applyZoomView'>;
+
+export interface UseLabelRegionsProps {
+  waveSurferInstanceRef: RefObject<WaveSurfer | null>;
+  regionsPluginRef: RefObject<RegionsPlugin | null>;
+  audioUrl: string | undefined;
+  spectrogramPlotType: SpectrogramType;
+  isReadyAudio: boolean;
+}

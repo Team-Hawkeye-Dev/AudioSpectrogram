@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogram-windowed.js';
+import type RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
 import { useTheme } from '@mui/material/styles';
 import {
   DEFAULT_INITIAL_SCROLL_TIME,
@@ -12,6 +13,7 @@ import {
 import { createWaveSurferPlugins, DEFAULT_WAVESURFER_OPTIONS } from '../consts/audioSpectrogramPluginsSettings';
 import type { AudioSpectrogramViewerProps, InitialView } from '../types/audioSpectrogram.types';
 import { onSpectrogramPlayback, onSpectrogramReady, rerenderSpectrogramAtZoom } from '../utils/spectrogramActions';
+import { useLabelRegions } from './useLabelRegions';
 import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 import { useMassiviAppStore } from '../../../../store/useStore';
 
@@ -20,6 +22,7 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
   const spectrogramContainerRef = useRef<HTMLDivElement | null>(null);
   const waveSurferInstanceRef = useRef<WaveSurfer | null>(null);
   const spectrogramPluginRef = useRef<WindowedSpectrogramPlugin | null>(null);
+  const regionsPluginRef = useRef<RegionsPlugin | null>(null);
   const initialViewRef = useRef<InitialView | null>(null);
 
   const setSpectrogramAudioDuration = useMassiviAppStore((state) => state.anchorValidationSection.setSpectrogramAudioDuration)
@@ -81,12 +84,13 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
       currentEndTime: VISIBLE_WINDOW_SECONDS
     })
 
-    const { spectrogramPlugin, plugins } = createWaveSurferPlugins({
+    const { spectrogramPlugin, regionsPlugin, plugins } = createWaveSurferPlugins({
       containerHeight,
       maxFrequencyHz,
       theme
     })
     spectrogramPluginRef.current = spectrogramPlugin
+    regionsPluginRef.current = regionsPlugin
 
     const waveSurfer = WaveSurfer.create({
       ...DEFAULT_WAVESURFER_OPTIONS,
@@ -108,6 +112,7 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
     return () => {
       cleanupSpectrogram()
       spectrogramPluginRef.current = null
+      regionsPluginRef.current = null
       setIsPlaying(false)
       setPlaybackPosition(INITIAL_PLAYBACK_POSITION)
     }
@@ -116,6 +121,14 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
   const togglePlay = useCallback(() => {
     void waveSurferInstanceRef.current?.playPause()
   }, []);
+
+  useLabelRegions({
+    waveSurferInstanceRef,
+    regionsPluginRef,
+    audioUrl,
+    spectrogramPlotType,
+    isReadyAudio,
+  });
 
   return {
     spectrogramContainerRef,

@@ -61,6 +61,9 @@ export const renderEveryTimeLabel = (timeLinePlugin: TimelinePlugin) => {
   timeLinePlugin['updateVisibleNotches'] = () => {}
 }
 
+export const onWaveSurferPlay = (waveSurfer: WaveSurfer, onPlay: () => void): (() => void) =>
+  waveSurfer.on('play', onPlay)
+
 export const onSpectrogramPlayback = (
   waveSurfer: WaveSurfer,
   setIsPlaying: (isPlaying: boolean) => void,
@@ -73,7 +76,7 @@ export const onSpectrogramPlayback = (
     setPlaybackPosition({ currentTime, progressLinePx })
   }
 
-  waveSurfer.on('play', () => setIsPlaying(true))
+  onWaveSurferPlay(waveSurfer, () => setIsPlaying(true))
   waveSurfer.on('pause', () => setIsPlaying(false))
   waveSurfer.on('finish', () => setIsPlaying(false))
   waveSurfer.on('timeupdate', updatePlaybackPosition)
