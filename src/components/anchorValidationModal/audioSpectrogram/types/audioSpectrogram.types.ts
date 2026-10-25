@@ -16,28 +16,26 @@ export interface AudioSpectrogramSource {
   stepHz: number
 }
 
-export interface AudioSpectrogramViewerProps {
+export interface SpectrogramInteractionContext {
   spectrogramContainerRef: RefObject<HTMLDivElement | null>;
   waveSurferInstanceRef: RefObject<WaveSurfer | null>;
-  initialViewRef: RefObject<InitialView | null>;
   spectrogramPlotType: SpectrogramType;
   isReadyAudio: boolean;
+}
+
+export interface ZoomSelectionProps extends SpectrogramInteractionContext {
+  initialViewRef: RefObject<InitialView | null>;
+  applyZoomView: (view: InitialView, keepAutoScroll: boolean) => void;
+}
+
+export interface AudioSpectrogramViewerProps extends ZoomSelectionProps {
   isPlaying: boolean;
   togglePlay: () => void;
   playbackPosition: PlaybackPosition;
   detections: AudioSpectrogramDetectionControls;
-  applyZoomView: (view: InitialView, keepAutoScroll: boolean) => void;
 }
 
-export type ZoomSelectionContext = Omit<AudioSpectrogramViewerProps, 'isPlaying' | 'togglePlay' | 'playbackPosition' | 'detections'>;
-
-export type SpectrogramInteractionContext = Omit<ZoomSelectionContext, 'initialViewRef' | 'applyZoomView'>;
-
-export interface UseLabelRegionsProps {
-  spectrogramContainerRef: RefObject<HTMLDivElement | null>;
-  waveSurferInstanceRef: RefObject<WaveSurfer | null>;
+export interface UseLabelRegionsProps extends SpectrogramInteractionContext {
   regionsPluginRef: RefObject<RegionsPlugin | null>;
   audioUrl: string | undefined;
-  spectrogramPlotType: SpectrogramType;
-  isReadyAudio: boolean;
 }
