@@ -9,18 +9,17 @@ interface DetectionsNavigatorProps {
     isReadyAudio: boolean;
 }
 
-export const DetectionsNavigator = ({ detections, isReadyAudio }: DetectionsNavigatorProps) => (
+export const DetectionsNavigator = ({ detections: {goToPreviousDetection, goToFirstDetection, goToNextDetection }, isReadyAudio }: DetectionsNavigatorProps) => (
     <DetectionsNavigatorArea>
         <DetectionStepButton
-            onClick={detections.goToPreviousDetection}
+            onClick={goToPreviousDetection}
             disabled={!isReadyAudio}
             size="small"
-            aria-label="Previous detection"
         >
             <NavigateBeforeIcon fontSize="small" />
         </DetectionStepButton>
         <DetectionsButton
-            onClick={detections.goToFirstDetection}
+            onClick={goToFirstDetection}
             disabled={!isReadyAudio}
             size="small"
             startIcon={<TrackChangesIcon fontSize="small" />}
@@ -28,10 +27,9 @@ export const DetectionsNavigator = ({ detections, isReadyAudio }: DetectionsNavi
             Detections
         </DetectionsButton>
         <DetectionStepButton
-            onClick={detections.goToNextDetection}
+            onClick={goToNextDetection}
             disabled={!isReadyAudio}
             size="small"
-            aria-label="Next detection"
         >
             <NavigateNextIcon fontSize="small" />
         </DetectionStepButton>

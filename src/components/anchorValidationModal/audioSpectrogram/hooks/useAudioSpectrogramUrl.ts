@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { SpectrogramType } from '../consts/audioSpectrogram.consts';
 import { topService } from '../../../../services/top/topService';
 import { bottomService } from '../../../../services/bottom/bottomService';
-
-const AUDIO_MIME_TYPE = 'audio/mpeg';
+import { createAudioSpectrogramUrl } from '../utils/createAudioSpectrogramUrl';
+import type { AudioSPectrogramUrlData } from '../types/audioSpectrogram.types';
 
 export type AudioSpectrogramUrlStatus = {
   audioUrl: string | undefined;
@@ -11,9 +11,6 @@ export type AudioSpectrogramUrlStatus = {
   isFetching: boolean,
   error: Error | null
 }
-
-const createAudioSpectrogramUrl = (base64Audio: string): string =>
-  `data:${AUDIO_MIME_TYPE};base64,${base64Audio}`;
 
 const fetchSoundData = (audioGuid: string, spectrogramType: SpectrogramType) =>
   spectrogramType === SpectrogramType.BOTTOM
@@ -26,7 +23,7 @@ export const useAudioSpectrogramUrl = (
 ): AudioSpectrogramUrlStatus => {
   const { data, isFetching, error } = useQuery({
     queryKey: ['audioSpectrogramUrl', spectrogramType, audioGuid],
-    queryFn: async () => {
+    queryFn: async (): Promise<AudioSPectrogramUrlData | undefined> => {
       if (!audioGuid) return undefined;
       const soundData = await fetchSoundData(audioGuid, spectrogramType);
       const session = soundData.sessions[0];

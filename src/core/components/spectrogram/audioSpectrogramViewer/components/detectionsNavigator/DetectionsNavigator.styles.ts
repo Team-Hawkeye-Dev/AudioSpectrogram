@@ -15,7 +15,6 @@ export const DetectionsButton = styled(Button)(({ theme }) => ({
     borderRadius: 0,
     padding: theme.spacing(1, 2),
     color: theme.palette.text.primary,
-    fontWeight: theme.typography.fontWeightMedium,
     borderLeft: `1px solid ${theme.palette.divider}`,
     borderRight: `1px solid ${theme.palette.divider}`,
     transition: theme.transitions.create('background-color', {
