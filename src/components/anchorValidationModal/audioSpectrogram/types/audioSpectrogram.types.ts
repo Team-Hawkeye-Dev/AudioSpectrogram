@@ -16,6 +16,11 @@ export interface AudioSpectrogramSource {
   stepHz: number
 }
 
+export interface SoundLabel {
+  startTime: number;
+  endTime: number;
+}
+
 export interface SpectrogramInteractionContext {
   spectrogramContainerRef: RefObject<HTMLDivElement | null>;
   waveSurferInstanceRef: RefObject<WaveSurfer | null>;

@@ -34,6 +34,7 @@ export const useLabelRegions = ({
     if (!isReadyAudio || !waveSurfer || !regionsPlugin || !audioUrl) return;
 
     labelAudioRef.current = new Audio(audioUrl);
+    
     labelsRef.current = SPECTROGRAM_LABELS[spectrogramPlotType].map(({ startTime, endTime }) =>
       regionsPlugin.addRegion({
         start: startTime,
@@ -96,8 +97,13 @@ export const useLabelRegions = ({
     void playLabel(labelsRef.current[detectionIndex]);
   };
 
+  const goToFirstDetection = () => {
+    waveSurferInstanceRef.current?.setScrollTime(0);
+    goToDetection(0);
+  };
+
   return {
-    goToFirstDetection: () => goToDetection(0),
+    goToFirstDetection,
     goToPreviousDetection: () => goToDetection(detectionIndexRef.current - 1),
     goToNextDetection: () => goToDetection(detectionIndexRef.current + 1),
   };
