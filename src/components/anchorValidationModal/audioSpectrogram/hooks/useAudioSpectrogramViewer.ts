@@ -17,7 +17,7 @@ import { useLabelRegions } from './useLabelRegions';
 import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 import { useMassiviAppStore } from '../../../../store/useStore';
 
-export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequencyHz: number, spectrogramPlotType: SpectrogramType): AudioSpectrogramViewerProps => {
+export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequencyHz: number, spectrogramPlotType: SpectrogramType, pickingLabelData: string | undefined): AudioSpectrogramViewerProps => {
   const theme = useTheme();
   const spectrogramContainerRef = useRef<HTMLDivElement | null>(null);
   const waveSurferInstanceRef = useRef<WaveSurfer | null>(null);
@@ -123,7 +123,7 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
     waveSurferInstanceRef,
     regionsPluginRef,
     audioUrl,
-    spectrogramPlotType,
+    pickingLabelData,
     isReadyAudio,
   });
 

@@ -40,7 +40,8 @@ export interface AudioSpectrogramViewerProps extends ZoomSelectionProps {
   detections: AudioSpectrogramDetectionControls;
 }
 
-export interface UseLabelRegionsProps extends SpectrogramInteractionContext {
+export interface UseLabelRegionsProps extends Omit<SpectrogramInteractionContext, 'spectrogramPlotType'> {
   regionsPluginRef: RefObject<RegionsPlugin | null>;
   audioUrl: string | undefined;
+  pickingLabelData: string | undefined;
 }

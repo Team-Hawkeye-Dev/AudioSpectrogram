@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef } from 'react';
 import { alpha, useTheme } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import type { Region } from 'wavesurfer.js/dist/plugins/regions.js';
-import { SPECTROGRAM_LABELS } from '../consts/audioSpectrogram.consts';
-import type { UseLabelRegionsProps } from '../types/audioSpectrogram.types';
+import { PICKING_LABEL_FIELD_SEPARATOR, PICKING_LABEL_LINE_SEPARATOR } from '../consts/audioSpectrogram.consts';
+import type { SoundLabel, UseLabelRegionsProps } from '../types/audioSpectrogram.types';
 import type { AudioSpectrogramDetectionControls } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 import { onWaveSurferPlay, scrollRegionIntoView } from '../utils/spectrogramActions';
 
@@ -12,7 +12,7 @@ export const useLabelRegions = ({
   waveSurferInstanceRef,
   regionsPluginRef,
   audioUrl,
-  spectrogramPlotType,
+  pickingLabelData,
   isReadyAudio,
 }: UseLabelRegionsProps): AudioSpectrogramDetectionControls => {
   const theme = useTheme();
@@ -31,19 +31,26 @@ export const useLabelRegions = ({
   useEffect(() => {
     const waveSurfer = waveSurferInstanceRef.current;
     const regionsPlugin = regionsPluginRef.current;
-    if (!isReadyAudio || !waveSurfer || !regionsPlugin || !audioUrl) return;
+    if (!isReadyAudio || !waveSurfer || !regionsPlugin || !audioUrl || !pickingLabelData) return;
 
     labelAudioRef.current = new Audio(audioUrl);
-    
-    labelsRef.current = SPECTROGRAM_LABELS[spectrogramPlotType].map(({ startTime, endTime }) =>
-      regionsPlugin.addRegion({
-        start: startTime,
-        end: endTime,
-        color: alpha(theme.palette.success.main, 0.3),
-        drag: false,
-        resize: false,
-      }),
-    );
+    labelsRef.current = pickingLabelData
+      .trim()
+      .split(PICKING_LABEL_LINE_SEPARATOR)
+      .map((line): SoundLabel => {
+        const [startTime, endTime] = line.split(PICKING_LABEL_FIELD_SEPARATOR).map(Number);
+        return { startTime, endTime };
+      })
+      .sort((firstLabel, secondLabel) => firstLabel.startTime - secondLabel.startTime)
+      .map(({ startTime, endTime }) =>
+        regionsPlugin.addRegion({
+          start: startTime,
+          end: endTime,
+          color: alpha(theme.palette.success.main, 0.3),
+          drag: false,
+          resize: false,
+        }),
+      );
     const unsubscribeFromPlay = onWaveSurferPlay(waveSurfer, stopLabelAudio);
 
     return () => {
@@ -53,7 +60,7 @@ export const useLabelRegions = ({
       labelsRef.current = [];
       detectionIndexRef.current = -1;
     };
-  }, [isReadyAudio, audioUrl, spectrogramPlotType, theme, stopLabelAudio, waveSurferInstanceRef, regionsPluginRef]);
+  }, [isReadyAudio, audioUrl, pickingLabelData, theme, stopLabelAudio, waveSurferInstanceRef, regionsPluginRef]);
 
   const playLabel = async (label: Region) => {
     const waveSurfer = waveSurferInstanceRef.current;

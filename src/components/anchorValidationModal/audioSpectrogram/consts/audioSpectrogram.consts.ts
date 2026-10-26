@@ -1,8 +1,5 @@
 import type { PlaybackPosition } from "../../../../core/components/spectrogram/audioSpectrogramViewer/types";
 import type { SpectrogramWindow } from "../../../../store/slices/anchorValidationSectionSlice";
-import type { SoundLabel } from "../../../../services/soundData.types";
-import { TOP_DEMO_LABELS } from "../../../../services/top/topDemoLabels";
-import { BOTTOM_DEMO_LABELS } from "../../../../services/bottom/bottomDemoLabels";
 
 export const VISIBLE_WINDOW_SECONDS = 90;
 
@@ -41,10 +38,8 @@ export const INITIAL_PLAYBACK_POSITION: PlaybackPosition = { currentTime: 0, pro
 
 export type SpectrogramType = (typeof SpectrogramType)[keyof typeof SpectrogramType];
 
-export const SPECTROGRAM_LABELS: Record<SpectrogramType, SoundLabel[]> = {
-    [SpectrogramType.TOP]: TOP_DEMO_LABELS,
-    [SpectrogramType.BOTTOM]: BOTTOM_DEMO_LABELS
-};
+export const PICKING_LABEL_LINE_SEPARATOR = '\n';
+export const PICKING_LABEL_FIELD_SEPARATOR = '\t';
 
 const DEFAULT_SPECTROGRAM_WINDOW: SpectrogramWindow = {
     currentStartTime: 0,

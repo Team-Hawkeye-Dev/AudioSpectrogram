@@ -10,7 +10,7 @@ export const AudioSpectrogramSourcePlot = ({
     maxHz,
     stepHz
 }: AudioSpectrogramSource) => {
-    const { audioUrl } = useAudioSpectrogramUrl(audioGuid, spectrogramType)
+    const { audioUrl, pickingLabelData } = useAudioSpectrogramUrl(audioGuid, spectrogramType)
     const {
         spectrogramContainerRef,
         waveSurferInstanceRef,
@@ -22,7 +22,7 @@ export const AudioSpectrogramSourcePlot = ({
         togglePlay,
         playbackPosition,
         detections,
-    } = useAudioSpectrogramViewer(audioUrl, maxHz, spectrogramType)
+    } = useAudioSpectrogramViewer(audioUrl, maxHz, spectrogramType, pickingLabelData)
 
     const zoom = useZoomSelection({
         spectrogramContainerRef,
