@@ -92,6 +92,10 @@ export const useLabelRegions = ({
   };
 
   const goToDetection = (detectionIndex: number) => {
+    if (!labelsRef.current.length) {
+      enqueueSnackbar('There are no detections', { variant: 'info', preventDuplicate: true });
+      return;
+    }
     if (detectionIndex < 0) {
       enqueueSnackbar('This is the first detection', { variant: 'info', preventDuplicate: true });
       return;
