@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { alpha, useTheme } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import type { Region } from 'wavesurfer.js/dist/plugins/regions.js';
 import { PICKING_LABEL_FIELD_SEPARATOR, PICKING_LABEL_LINE_SEPARATOR } from '../consts/audioSpectrogram.consts';
 import type { SoundLabel, UseLabelRegionsProps } from '../types/audioSpectrogram.types';
 import type { AudioSpectrogramDetectionControls } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
-import { onWaveSurferPlay, scrollRegionIntoView } from '../utils/spectrogramActions';
+import { setWaveSurferPlayCallback, scrollRegionIntoView } from '../utils/spectrogramActions';
+import type WaveSurfer from 'wavesurfer.js';
 
 export const useLabelRegions = ({
   spectrogramContainerRef,
@@ -20,13 +21,20 @@ export const useLabelRegions = ({
   const labelAudioRef = useRef<HTMLAudioElement | null>(null);
   const labelsRef = useRef<Region[]>([]);
   const playingShadeRef = useRef<Region | null>(null);
-  const detectionIndexRef = useRef(-1);
+  const [currentDetectionIndex, setCurrentDetectionIndex] = useState<number>(-1);
+  const savedAutoScrollRef = useRef<boolean | null>(null);
 
-  const stopLabelAudio = useCallback(() => {
+  const restoreAutoScroll = useCallback((waveSurfer: WaveSurfer) => {
+    if (savedAutoScrollRef.current === null) return;
+    waveSurfer.options.autoScroll = savedAutoScrollRef.current;
+    savedAutoScrollRef.current = null;
+  }, [waveSurferInstanceRef]);
+
+  const stopLabelAudio = () => {
     labelAudioRef.current?.pause();
     playingShadeRef.current?.remove();
     playingShadeRef.current = null;
-  }, []);
+  };
 
   useEffect(() => {
     const waveSurfer = waveSurferInstanceRef.current;
@@ -51,14 +59,18 @@ export const useLabelRegions = ({
           resize: false,
         }),
       );
-    const unsubscribeFromPlay = onWaveSurferPlay(waveSurfer, stopLabelAudio);
+    const unsubscribeFromPlay = setWaveSurferPlayCallback(waveSurfer, () => {
+      stopLabelAudio();
+      restoreAutoScroll(waveSurfer);
+    });
 
     return () => {
       unsubscribeFromPlay();
       stopLabelAudio();
+      restoreAutoScroll(waveSurfer)
       regionsPlugin.clearRegions();
       labelsRef.current = [];
-      detectionIndexRef.current = -1;
+      setCurrentDetectionIndex(-1);
     };
   }, [isReadyAudio, audioUrl, pickingLabelData, theme, stopLabelAudio, waveSurferInstanceRef, regionsPluginRef]);
 
@@ -70,6 +82,9 @@ export const useLabelRegions = ({
 
     stopLabelAudio();
     waveSurfer.pause();
+    restoreAutoScroll(waveSurfer)
+    savedAutoScrollRef.current = waveSurfer.options.autoScroll;
+    waveSurfer.options.autoScroll = false;
     scrollRegionIntoView(waveSurfer, label, spectrogramContainerRef.current?.clientWidth ?? 0);
     labelAudio.currentTime = label.start;
     await labelAudio.play();
@@ -88,7 +103,10 @@ export const useLabelRegions = ({
       { duration: (label.end - label.start) * 1000 },
     ).finished;
 
-    if (playingShadeRef.current === playingShade) stopLabelAudio();
+    if (playingShadeRef.current === playingShade) {
+      stopLabelAudio();
+      restoreAutoScroll(waveSurfer)
+    }
   };
 
   const goToDetection = (detectionIndex: number) => {
@@ -104,18 +122,19 @@ export const useLabelRegions = ({
       enqueueSnackbar('This is the last detection', { variant: 'info', preventDuplicate: true });
       return;
     }
-    detectionIndexRef.current = detectionIndex;
+    setCurrentDetectionIndex(detectionIndex);
     void playLabel(labelsRef.current[detectionIndex]);
   };
 
   const goToFirstDetection = () => {
-    waveSurferInstanceRef.current?.setScrollTime(0);
+    const firstDetection = labelsRef.current[0]
+    waveSurferInstanceRef.current?.setScrollTime(firstDetection.start);
     goToDetection(0);
   };
 
   return {
     goToFirstDetection,
-    goToPreviousDetection: () => goToDetection(detectionIndexRef.current - 1),
-    goToNextDetection: () => goToDetection(detectionIndexRef.current + 1),
+    goToPreviousDetection: () => goToDetection(currentDetectionIndex - 1),
+    goToNextDetection: () => goToDetection(currentDetectionIndex + 1),
   };
 };
