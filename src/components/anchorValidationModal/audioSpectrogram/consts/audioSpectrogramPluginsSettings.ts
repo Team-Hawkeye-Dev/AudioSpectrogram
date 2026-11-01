@@ -26,7 +26,8 @@ export const DEFAULT_WAVESURFER_OPTIONS = {
     autoCenter: false,
     hideScrollbar: true,
     cursorColor: PROGRESS_LINE_COLOR,
-    cursorWidth: PROGRESS_LINE_WIDTH_PX
+    cursorWidth: PROGRESS_LINE_WIDTH_PX,
+    renderFunction: () => {}
 };
 
 const createSpectrogramOptions = (containerHeight: number, maxFrequencyHz: number): WindowedSpectrogramPluginOptions => ({
@@ -37,6 +38,7 @@ const createSpectrogramOptions = (containerHeight: number, maxFrequencyHz: numbe
     colorMap: SPECTROGRAM_COLOR_MAP,
     scale: 'linear',
     progressiveLoading: false,
+    useWebWorker: true,
     labels: false,
 });
 

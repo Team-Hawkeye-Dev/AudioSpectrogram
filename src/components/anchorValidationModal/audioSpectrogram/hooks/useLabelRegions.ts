@@ -30,11 +30,11 @@ export const useLabelRegions = ({
     savedAutoScrollRef.current = null;
   }, [waveSurferInstanceRef]);
 
-  const stopLabelAudio = () => {
+  const stopLabelAudio = useCallback(() => {
     labelAudioRef.current?.pause();
     playingShadeRef.current?.remove();
     playingShadeRef.current = null;
-  };
+  }, []);
 
   useEffect(() => {
     const waveSurfer = waveSurferInstanceRef.current;
