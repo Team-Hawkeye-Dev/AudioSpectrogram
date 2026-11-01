@@ -25,7 +25,7 @@ export const AnchorValidationModal = () => {
     <AnchorValidationOverlay open={isAnchorValidationModalOpen}>
       <AnchorValidationModalContainer>
         <SpectrogramContainer>
-          <AudioSpectrogramModal/>
+          {isAnchorValidationModalOpen && <AudioSpectrogramModal/>}
         </SpectrogramContainer>
         <CloseButtonWrapper onClick={() => setIsAnchorValidationModalOpen(false)}>
           <CloseIcon fontSize="medium" />
