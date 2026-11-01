@@ -30,7 +30,7 @@ export interface SpectrogramInteractionContext {
 
 export interface ZoomSelectionProps extends SpectrogramInteractionContext {
   initialViewRef: RefObject<InitialView | null>;
-  applyZoomView: (view: InitialView, keepAutoScroll: boolean) => void;
+  applyZoomView: (view: InitialView) => void;
 }
 
 export interface AudioSpectrogramViewerProps extends ZoomSelectionProps {

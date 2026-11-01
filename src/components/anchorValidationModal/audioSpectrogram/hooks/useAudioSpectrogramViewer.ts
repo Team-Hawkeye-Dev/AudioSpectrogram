@@ -37,14 +37,13 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
     [setSpectrogramAudioDuration, spectrogramPlotType],
   );
 
-  const applyZoomView = useCallback((view: InitialView, keepAutoScroll: boolean) => {
+  const applyZoomView = useCallback((view: InitialView) => {
     const waveSurferInstance = waveSurferInstanceRef.current;
     const decodedAudio = waveSurferInstance?.getDecodedData()
     if (!waveSurferInstance || !decodedAudio) return;
 
     const { minPxPerSec, scrollTime } = view;
     const scrollOffsetPx = scrollTime * minPxPerSec
-    waveSurferInstance.options.autoScroll = keepAutoScroll
     waveSurferInstance.zoom(minPxPerSec);
     waveSurferInstance.setScroll(scrollOffsetPx)
     rerenderSpectrogramAtZoom(spectrogramPluginRef.current, decodedAudio)
@@ -64,7 +63,7 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
       currentStartTime: DEFAULT_INITIAL_SCROLL_TIME,
       currentEndTime: audioDuration
     })
-    applyZoomView(fitView, true)
+    applyZoomView(fitView)
   }, [spectrogramPlotType, setSpectrogramWindow, applyZoomView]);
 
   useEffect(() => {

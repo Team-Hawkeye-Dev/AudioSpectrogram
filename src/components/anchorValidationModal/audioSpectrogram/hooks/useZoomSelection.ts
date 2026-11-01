@@ -37,15 +37,15 @@ export const useZoomSelection = ({
     isReadyAudio,
     minZoomPxPerSec: minZoom,
     onZoomIn: (minPxPerSec, scrollTime) => {
-      applyZoomView({ minPxPerSec, scrollTime }, false);
+      applyZoomView({ minPxPerSec, scrollTime });
     },
     onZoomOut: (minPxPerSec, scrollTime) => {
-      applyZoomView({ minPxPerSec, scrollTime }, minPxPerSec === minZoom);
+      applyZoomView({ minPxPerSec, scrollTime });
     },
   });
 
   const resetZoom = useCallback(() => {
-    applyZoomView({minPxPerSec: minZoom, scrollTime: 0}, true)
+    applyZoomView({minPxPerSec: minZoom, scrollTime: 0})
   }, [minZoom, applyZoomView]);
 
   return {
