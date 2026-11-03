@@ -1,0 +1,170 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import WaveSurfer from 'wavesurfer.js';
+import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogram-windowed.js';
+import type RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
+import { useTheme } from '@mui/material/styles';
+import {
+  DEFAULT_INITIAL_SCROLL_TIME,
+  INITIAL_PLAYBACK_POSITION,
+  RECORDING_START_LEAD_RATIO,
+  TIME_AXIS_HEIGHT_PX,
+  VISIBLE_WINDOW_SECONDS,
+  type SpectrogramType,
+} from '../consts/audioSpectrogram.consts';
+import { createWaveSurferPlugins, DEFAULT_WAVESURFER_OPTIONS } from '../consts/audioSpectrogramPluginsSettings';
+import type { AudioSpectrogramViewerProps, InitialView, SpectrogramTimeline } from '../types/audioSpectrogram.types';
+import { keepPlaybackInRecording, onSpectrogramPlayback, onSpectrogramReady, rerenderSpectrogramAtZoom } from '../utils/spectrogramActions';
+import { useLabelRegions } from './useLabelRegions';
+import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
+import { useMassiviAppStore } from '../../../../store/useStore';
+
+export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequencyHz: number, spectrogramPlotType: SpectrogramType, pickingLabelData: string | undefined, timeline: SpectrogramTimeline | undefined): AudioSpectrogramViewerProps => {
+  const theme = useTheme();
+  const spectrogramContainerRef = useRef<HTMLDivElement | null>(null);
+  const waveSurferInstanceRef = useRef<WaveSurfer | null>(null);
+  const spectrogramPluginRef = useRef<WindowedSpectrogramPlugin | null>(null);
+  const regionsPluginRef = useRef<RegionsPlugin | null>(null);
+  const initialViewRef = useRef<InitialView | null>(null);
+  const timelineStartMs = timeline?.timelineStartMs;
+  const recordingStartTime = timeline?.recordingStartTime ?? 0;
+
+  const setSpectrogramAudioDuration = useMassiviAppStore((state) => state.anchorValidationSection.setSpectrogramAudioDuration)
+  const setSpectrogramWindow = useMassiviAppStore((state) => state.anchorValidationSection.setSpectrogramWindow)
+
+  const [isReadyAudio, setIsReadyAudio] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackPosition, setPlaybackPosition] = useState<PlaybackPosition>(INITIAL_PLAYBACK_POSITION);
+
+  const setAudioDuration = useCallback(
+    (audioDuration: number) => setSpectrogramAudioDuration(spectrogramPlotType, audioDuration),
+    [setSpectrogramAudioDuration, spectrogramPlotType],
+  );
+
+  const applyZoomView = useCallback((view: InitialView) => {
+    const waveSurferInstance = waveSurferInstanceRef.current;
+    const decodedAudio = waveSurferInstance?.getDecodedData()
+    if (!waveSurferInstance || !decodedAudio) return;
+
+    const { minPxPerSec, scrollTime } = view;
+    const scrollOffsetPx = scrollTime * minPxPerSec
+    waveSurferInstance.zoom(minPxPerSec);
+    waveSurferInstance.setScroll(scrollOffsetPx)
+    rerenderSpectrogramAtZoom(spectrogramPluginRef.current, decodedAudio)
+  }, []);
+
+  const fitViewToShortAudio = useCallback((audioDuration: number) => {
+    if (audioDuration >= VISIBLE_WINDOW_SECONDS) return;
+    const containerWidth = spectrogramContainerRef.current?.clientWidth;
+    if (!containerWidth) return;
+
+    const fitView: InitialView = {
+      minPxPerSec: containerWidth / audioDuration,
+      scrollTime: DEFAULT_INITIAL_SCROLL_TIME,
+    }
+    initialViewRef.current = fitView;
+    setSpectrogramWindow(spectrogramPlotType, {
+      currentStartTime: DEFAULT_INITIAL_SCROLL_TIME,
+      currentEndTime: audioDuration
+    })
+    applyZoomView(fitView)
+  }, [spectrogramPlotType, setSpectrogramWindow, applyZoomView]);
+
+  useEffect(() => {
+    const spectrogramContainer = spectrogramContainerRef.current;
+    if (!spectrogramContainer || !audioUrl || timelineStartMs === undefined) return;
+
+    const containerWidth = spectrogramContainer.clientWidth;
+    const containerHeight = spectrogramContainer.clientHeight - TIME_AXIS_HEIGHT_PX;
+
+    const defaultView: InitialView = {
+      minPxPerSec: containerWidth / VISIBLE_WINDOW_SECONDS,
+      scrollTime: DEFAULT_INITIAL_SCROLL_TIME
+    }
+    initialViewRef.current = defaultView
+    setSpectrogramWindow(spectrogramPlotType, {
+      currentStartTime: DEFAULT_INITIAL_SCROLL_TIME,
+      currentEndTime: VISIBLE_WINDOW_SECONDS
+    })
+
+    const { spectrogramPlugin, regionsPlugin, plugins } = createWaveSurferPlugins({
+      containerHeight,
+      maxFrequencyHz,
+      theme,
+      timelineStartMs
+    })
+    spectrogramPluginRef.current = spectrogramPlugin
+    regionsPluginRef.current = regionsPlugin
+
+    const waveSurfer = WaveSurfer.create({
+      ...DEFAULT_WAVESURFER_OPTIONS,
+      container: spectrogramContainer,
+      url: audioUrl,
+      minPxPerSec: defaultView.minPxPerSec,
+      plugins,
+    });
+
+    onSpectrogramPlayback(waveSurfer, setIsPlaying, setPlaybackPosition, recordingStartTime);
+    keepPlaybackInRecording(waveSurfer, recordingStartTime);
+
+    const cleanupSpectrogram = onSpectrogramReady(
+      waveSurferInstanceRef,
+      waveSurfer,
+      setAudioDuration,
+      setIsReadyAudio,
+      fitViewToShortAudio
+    )
+    return () => {
+      cleanupSpectrogram()
+      spectrogramPluginRef.current = null
+      regionsPluginRef.current = null
+      setIsPlaying(false)
+      setPlaybackPosition(INITIAL_PLAYBACK_POSITION)
+    }
+  }, [audioUrl, maxFrequencyHz, theme, spectrogramPlotType, timelineStartMs, recordingStartTime, setAudioDuration, setSpectrogramWindow, fitViewToShortAudio]);
+
+  const detections = useLabelRegions({
+    spectrogramContainerRef,
+    waveSurferInstanceRef,
+    regionsPluginRef,
+    audioUrl,
+    pickingLabelData,
+    recordingStartTime,
+    isReadyAudio,
+  });
+
+  const togglePlay = () => {
+    void waveSurferInstanceRef.current?.playPause();
+  };
+
+  const goToRecordingStart = () => {
+    const waveSurfer = waveSurferInstanceRef.current;
+    const containerWidth = spectrogramContainerRef.current?.clientWidth;
+    if (!waveSurfer || !containerWidth) return;
+
+    const visibleDuration = containerWidth / waveSurfer.options.minPxPerSec;
+    const scrollTime = recordingStartTime - visibleDuration * RECORDING_START_LEAD_RATIO;
+    waveSurfer.setScrollTime(scrollTime);
+    setSpectrogramWindow(spectrogramPlotType, {
+      currentStartTime: scrollTime,
+      currentEndTime: scrollTime + visibleDuration
+    })
+  };
+
+  return {
+    spectrogramContainerRef,
+    waveSurferInstanceRef,
+    initialViewRef,
+    spectrogramPlotType,
+    isReadyAudio,
+    isPlaying,
+    togglePlay,
+    playbackPosition,
+    detections,
+    timeline: timelineStartMs === undefined ? undefined : {
+      timelineStartMs,
+      recordingStartTime,
+      goToRecordingStart: recordingStartTime > VISIBLE_WINDOW_SECONDS ? goToRecordingStart : undefined,
+    },
+    applyZoomView,
+  };
+};
