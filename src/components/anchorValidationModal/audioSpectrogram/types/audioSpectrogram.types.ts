@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 import type RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
 import type { SpectrogramType } from '../consts/audioSpectrogram.consts';
-import type { AudioSpectrogramDetectionControls, PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
+import type { AudioSpectrogramDetectionControls, AudioSpectrogramTimelineControls, PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 
 export interface InitialView {
   minPxPerSec: number;
@@ -13,7 +13,13 @@ export interface AudioSpectrogramSource {
   audioGuid: string | null;
   spectrogramType: SpectrogramType;
   maxHz: number;
-  stepHz: number
+  stepHz: number;
+  earliestStartTimeMs: number | undefined;
+}
+
+export interface SpectrogramTimeline {
+  timelineStartMs: number;
+  recordingStartTime: number;
 }
 
 export interface SoundLabel {
@@ -38,6 +44,7 @@ export interface AudioSpectrogramViewerProps extends ZoomSelectionProps {
   togglePlay: () => void;
   playbackPosition: PlaybackPosition;
   detections: AudioSpectrogramDetectionControls;
+  timeline: AudioSpectrogramTimelineControls | undefined;
 }
 
 export interface UseLabelRegionsProps {
@@ -46,10 +53,12 @@ export interface UseLabelRegionsProps {
   regionsPluginRef: RefObject<RegionsPlugin | null>;
   audioUrl: string | undefined;
   pickingLabelData: string | undefined;
+  recordingStartTime: number;
   isReadyAudio: boolean;
 }
 
 export interface AudioSPectrogramUrlData {
   audioUrl: string | undefined;
   pickingLabelData: string | undefined;
+  recordingStartTimeMs: number;
 }

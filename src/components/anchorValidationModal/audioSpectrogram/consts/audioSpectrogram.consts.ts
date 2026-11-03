@@ -34,9 +34,14 @@ export const SpectrogramType = {
     BOTTOM: 'bottom'
 } as const;
 
-export const INITIAL_PLAYBACK_POSITION: PlaybackPosition = { currentTime: 0, progressLinePx: 0 };
+export const INITIAL_PLAYBACK_POSITION: PlaybackPosition = { currentTime: 0, progressLinePx: 0, recordingStartPx: 0 };
 
 export type SpectrogramType = (typeof SpectrogramType)[keyof typeof SpectrogramType];
+
+export const MAX_ALIGNMENT_GAP_SECONDS = 600;
+export const RECORDING_START_LEAD_RATIO = 0.1;
+export const RECORDING_START_TOLERANCE_SECONDS = 0.01;
+export const PADDED_AUDIO_MIME_TYPE = 'audio/wav';
 
 export const PICKING_LABEL_LINE_SEPARATOR = '\n';
 export const PICKING_LABEL_FIELD_SEPARATOR = '\t';

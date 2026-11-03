@@ -4,6 +4,7 @@ import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogr
 import type TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.js';
 import type { Region } from 'wavesurfer.js/dist/plugins/regions.js';
 import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
+import { DEFAULT_INITIAL_SCROLL_TIME, RECORDING_START_TOLERANCE_SECONDS } from '../consts/audioSpectrogram.consts';
 
 export const onSpectrogramReady = (
   waveSurferInstanceRef: MutableRefObject<WaveSurfer | null>,
@@ -69,12 +70,14 @@ export const onSpectrogramPlayback = (
   waveSurfer: WaveSurfer,
   setIsPlaying: (isPlaying: boolean) => void,
   setPlaybackPosition: (playbackPosition: PlaybackPosition) => void,
+  recordingStartTime: number,
 ) => {
   const updatePlaybackPosition = () => {
     const currentTime = waveSurfer.getCurrentTime()
     const progressLineOffsetPx = currentTime * waveSurfer.options.minPxPerSec
     const progressLinePx = progressLineOffsetPx - waveSurfer.getScroll()
-    setPlaybackPosition({ currentTime, progressLinePx })
+    const recordingStartPx = recordingStartTime * waveSurfer.options.minPxPerSec - waveSurfer.getScroll()
+    setPlaybackPosition({ currentTime, progressLinePx, recordingStartPx })
   }
 
   setWaveSurferPlayCallback(waveSurfer, () => setIsPlaying(true))
@@ -83,6 +86,20 @@ export const onSpectrogramPlayback = (
   waveSurfer.on('timeupdate', updatePlaybackPosition)
   waveSurfer.on('scroll', updatePlaybackPosition)
   waveSurfer.on('zoom', updatePlaybackPosition)
+}
+
+export const keepPlaybackInRecording = (waveSurfer: WaveSurfer, recordingStartTime: number) => {
+  if (recordingStartTime <= 0) return
+
+  waveSurfer.on('ready', () => {
+    waveSurfer.setTime(recordingStartTime)
+    waveSurfer.once('timeupdate', () => waveSurfer.setScrollTime(DEFAULT_INITIAL_SCROLL_TIME))
+  })
+  waveSurfer.on('timeupdate', () => {
+    if (waveSurfer.getCurrentTime() < recordingStartTime - RECORDING_START_TOLERANCE_SECONDS) {
+      waveSurfer.setTime(recordingStartTime)
+    }
+  })
 }
 
 export const scrollRegionIntoView = (waveSurfer: WaveSurfer, region: Region, containerWidthPx: number) => {

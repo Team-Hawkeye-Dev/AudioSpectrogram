@@ -17,24 +17,28 @@ import {
 } from "./AudioSpectrogram.styles";
 import { useMassiviAppStore } from "../../../store/useStore";
 import { useAreAllSpectrogramsReady } from "./hooks/useAreAllSpectrogramsReady";
+import { useEarliestStartTimeMs } from "./hooks/useEarliestStartTimeMs";
 import type { AudioSpectrogramSource } from "./types/audioSpectrogram.types";
 
 export const AudioSpectrogramModal = () => {
   const spectrogramAudioGuid = useMassiviAppStore((state) => state.anchorValidationSection.spectrogramAudioGuid)
   const areAllSpectrogramReady = useAreAllSpectrogramsReady()
+  const earliestStartTimeMs = useEarliestStartTimeMs()
 
   const audioSpectrogramSources: AudioSpectrogramSource[] = [
     {
       audioGuid: spectrogramAudioGuid[SpectrogramType.TOP],
       spectrogramType: SpectrogramType.TOP,
       maxHz: MAX_HZ_TOP_SPECTROGRAM,
-      stepHz: TOP_SPECTROGRAM_STEP_HZ
+      stepHz: TOP_SPECTROGRAM_STEP_HZ,
+      earliestStartTimeMs
     },
     {
       audioGuid: spectrogramAudioGuid[SpectrogramType.BOTTOM],
       spectrogramType: SpectrogramType.BOTTOM,
       maxHz: MAX_HZ_BOTTOM_SPECTROGRAM,
-      stepHz: BOTTOM_SPECTROGRAM_STEP_HZ
+      stepHz: BOTTOM_SPECTROGRAM_STEP_HZ,
+      earliestStartTimeMs
     }
   ]
 

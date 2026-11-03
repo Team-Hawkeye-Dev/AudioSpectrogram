@@ -16,6 +16,13 @@ export interface AudioSpectrogramZoomControls {
 export interface PlaybackPosition {
     currentTime: number;
     progressLinePx: number;
+    recordingStartPx: number;
+}
+
+export interface AudioSpectrogramTimelineControls {
+    timelineStartMs: number;
+    recordingStartTime: number;
+    goToRecordingStart?: () => void;
 }
 
 export interface AudioSpectrogramPlaybackControls {
@@ -37,5 +44,6 @@ export interface AudioSpectrogramViewerProps {
     zoom: AudioSpectrogramZoomControls;
     playback: AudioSpectrogramPlaybackControls;
     detections: AudioSpectrogramDetectionControls;
+    timeline: AudioSpectrogramTimelineControls;
     isReadyAudio: boolean;
 }

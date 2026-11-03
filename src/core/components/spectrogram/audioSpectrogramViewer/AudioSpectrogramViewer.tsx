@@ -15,13 +15,14 @@ export const AudioSpectrogramViewer = ({
   zoom,
   playback,
   detections,
+  timeline,
   isReadyAudio,
 }: AudioSpectrogramViewerProps) => (
   <SpectrogramViewerRootContainer>
     <SpectrogramRowContainer>
       <SpectrogramPlotRow>
         <FrequencyLabels maxHz={maxHz} stepHz={stepHz} />
-        <WavePlotView spectrogramContainerRef={spectrogramContainerRef} zoom={zoom} playback={playback} />
+        <WavePlotView spectrogramContainerRef={spectrogramContainerRef} zoom={zoom} playback={playback} timeline={timeline} />
       </SpectrogramPlotRow>
       <SpectrogramControlsRow zoom={zoom} playback={playback} detections={detections} isReadyAudio={isReadyAudio} />
     </SpectrogramRowContainer>

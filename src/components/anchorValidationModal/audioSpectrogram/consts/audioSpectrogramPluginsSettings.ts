@@ -15,7 +15,7 @@ import {
     TIME_AXIS_INTERVAL_SECONDS,
 } from "./audioSpectrogram.consts";
 import { forceSpectrogramSegmentRendering, renderEveryTimeLabel } from "../utils/spectrogramActions";
-import { timeFormat } from "../../../../core/components/spectrogram/audioSpectrogramViewer/utils/formatPlaybackTime";
+import { formatClockTime } from "../../../../core/components/spectrogram/audioSpectrogramViewer/utils/formatPlaybackTime";
 
 export const DEFAULT_WAVESURFER_OPTIONS = {
     height: 0,
@@ -42,11 +42,11 @@ const createSpectrogramOptions = (containerHeight: number, maxFrequencyHz: numbe
     labels: false,
 });
 
-const createTimelinePluginOptions = (theme: Theme): TimelinePluginOptions => ({
+const createTimelinePluginOptions = (theme: Theme, timelineStartMs: number): TimelinePluginOptions => ({
     height: TIME_AXIS_HEIGHT_PX,
     timeInterval: TIME_AXIS_INTERVAL_SECONDS,
     primaryLabelInterval: TIME_AXIS_INTERVAL_SECONDS,
-    formatTimeCallback: timeFormat,
+    formatTimeCallback: (seconds) => formatClockTime(timelineStartMs, seconds),
     style: {
         fontSize: String(theme.typography.body2.fontSize),
         background: theme.palette.background.default,
@@ -57,11 +57,13 @@ const createTimelinePluginOptions = (theme: Theme): TimelinePluginOptions => ({
 export const createWaveSurferPlugins = ({
     containerHeight,
     maxFrequencyHz,
-    theme
+    theme,
+    timelineStartMs
 }: {
     containerHeight: number;
     maxFrequencyHz: number;
-    theme: Theme
+    theme: Theme;
+    timelineStartMs: number
 }) => {
     const spectrogramPlugin = WindowedSpectrogramPlugin.create(
         createSpectrogramOptions(containerHeight, maxFrequencyHz)
@@ -69,7 +71,7 @@ export const createWaveSurferPlugins = ({
     forceSpectrogramSegmentRendering(spectrogramPlugin);
 
     const timeLinePlugin = TimelinePlugin.create(
-        createTimelinePluginOptions(theme)
+        createTimelinePluginOptions(theme, timelineStartMs)
     );
     renderEveryTimeLabel(timeLinePlugin);
 

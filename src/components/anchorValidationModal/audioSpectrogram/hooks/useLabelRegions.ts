@@ -14,6 +14,7 @@ export const useLabelRegions = ({
   regionsPluginRef,
   audioUrl,
   pickingLabelData,
+  recordingStartTime,
   isReadyAudio,
 }: UseLabelRegionsProps): AudioSpectrogramDetectionControls => {
   const theme = useTheme();
@@ -52,8 +53,8 @@ export const useLabelRegions = ({
       .sort((firstLabel, secondLabel) => firstLabel.startTime - secondLabel.startTime)
       .map(({ startTime, endTime }) =>
         regionsPlugin.addRegion({
-          start: startTime,
-          end: endTime,
+          start: recordingStartTime + startTime,
+          end: recordingStartTime + endTime,
           color: alpha(theme.palette.success.main, 0.3),
           drag: false,
           resize: false,
@@ -72,7 +73,7 @@ export const useLabelRegions = ({
       labelsRef.current = [];
       setCurrentDetectionIndex(-1);
     };
-  }, [isReadyAudio, audioUrl, pickingLabelData, theme, stopLabelAudio, waveSurferInstanceRef, regionsPluginRef]);
+  }, [isReadyAudio, audioUrl, pickingLabelData, recordingStartTime, theme, stopLabelAudio, waveSurferInstanceRef, regionsPluginRef]);
 
   const playLabel = async (label: Region) => {
     const waveSurfer = waveSurferInstanceRef.current;
