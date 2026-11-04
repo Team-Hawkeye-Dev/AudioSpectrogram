@@ -7,4 +7,3 @@ export const TIMESTAMP_SECONDS_PAD_LENGTH = 2;
 export const TIMESTAMP_SECONDS_PAD_CHAR = '0';
 
 export const MS_PER_SECOND = 1000;
-export const CLOCK_TIME_LOCALE = 'en-GB';
