@@ -130,11 +130,11 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
 
   const togglePlay = () => {
     const waveSurfer = waveSurferInstanceRef.current;
-    if (waveSurfer && waveSurfer.getCurrentTime() < timeShift) {
-      void waveSurfer.play(timeShift);
-      return;
-    }
-    void waveSurfer?.playPause();
+    if (!waveSurfer) return;
+
+    const currentTime = waveSurfer.getCurrentTime();
+    const isOutsideRecording = currentTime < timeShift || currentTime >= waveSurfer.getDuration();
+    void (isOutsideRecording ? waveSurfer.play(timeShift) : waveSurfer.playPause());
   };
 
   return {
