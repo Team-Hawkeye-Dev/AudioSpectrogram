@@ -39,7 +39,6 @@ export const INITIAL_PLAYBACK_POSITION: PlaybackPosition = { currentTime: 0, pro
 export type SpectrogramType = (typeof SpectrogramType)[keyof typeof SpectrogramType];
 
 export const DEFAULT_TIME_SHIFT = 0;
-export const PADDED_AUDIO_MIME_TYPE = 'audio/wav';
 
 export const PICKING_LABEL_LINE_SEPARATOR = '\n';
 export const PICKING_LABEL_FIELD_SEPARATOR = '\t';
