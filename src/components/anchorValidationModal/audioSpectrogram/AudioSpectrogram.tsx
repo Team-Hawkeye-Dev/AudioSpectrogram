@@ -17,13 +17,16 @@ import {
 } from "./AudioSpectrogram.styles";
 import { useMassiviAppStore } from "../../../store/useStore";
 import { useAreAllSpectrogramsReady } from "./hooks/useAreAllSpectrogramsReady";
-import { useEarliestStartTimeMs } from "./hooks/useEarliestStartTimeMs";
+import { useAudioSpectrogramUrl } from "./hooks/useAudioSpectrogramUrl";
 import type { AudioSpectrogramSource } from "./types/audioSpectrogram.types";
 
 export const AudioSpectrogramModal = () => {
   const spectrogramAudioGuid = useMassiviAppStore((state) => state.anchorValidationSection.spectrogramAudioGuid)
   const areAllSpectrogramReady = useAreAllSpectrogramsReady()
-  const earliestStartTimeMs = useEarliestStartTimeMs()
+  const topSound = useAudioSpectrogramUrl(spectrogramAudioGuid[SpectrogramType.TOP], SpectrogramType.TOP)
+  const bottomSound = useAudioSpectrogramUrl(spectrogramAudioGuid[SpectrogramType.BOTTOM], SpectrogramType.BOTTOM)
+  const startTimesMs = [topSound.recordingStartTimeMs, bottomSound.recordingStartTimeMs].filter((startTimeMs) => startTimeMs !== undefined)
+  const earliestStartTimeMs = topSound.isLoading || bottomSound.isLoading ? undefined : Math.min(...startTimesMs)
 
   const audioSpectrogramSources: AudioSpectrogramSource[] = [
     {

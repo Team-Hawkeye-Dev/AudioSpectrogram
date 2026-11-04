@@ -13,6 +13,7 @@ import {
 import { createWaveSurferPlugins, DEFAULT_WAVESURFER_OPTIONS } from '../consts/audioSpectrogramPluginsSettings';
 import type { AudioSpectrogramViewerProps, InitialView } from '../types/audioSpectrogram.types';
 import { onSpectrogramPlayback, onSpectrogramReady, rerenderSpectrogramAtZoom } from '../utils/spectrogramActions';
+import { createTimelineControls } from '../utils/createTimelineControls';
 import { useLabelRegions } from './useLabelRegions';
 import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 import { useMassiviAppStore } from '../../../../store/useStore';
@@ -147,11 +148,7 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
     togglePlay,
     playbackPosition,
     detections,
-    timeline: timelineStartMs === undefined ? undefined : {
-      timelineStartMs,
-      recordingStartOffsetSeconds: timeShift,
-      goToRecordingStart: timeShift > VISIBLE_WINDOW_SECONDS ? () => waveSurferInstanceRef.current?.setTime(timeShift) : undefined,
-    },
+    timeline: createTimelineControls(waveSurferInstanceRef, timelineStartMs, timeShift),
     applyZoomView,
   };
 };
