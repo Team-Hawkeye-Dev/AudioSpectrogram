@@ -21,7 +21,7 @@ export interface PlaybackPosition {
 
 export interface AudioSpectrogramTimelineControls {
     timelineStartMs: number;
-    timeShift: number;
+    recordingStartOffsetSeconds: number;
     goToRecordingStart?: () => void;
 }
 

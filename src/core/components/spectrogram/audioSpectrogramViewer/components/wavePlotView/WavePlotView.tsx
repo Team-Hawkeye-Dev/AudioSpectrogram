@@ -21,12 +21,12 @@ export const WavePlotView = ({
   spectrogramContainerRef,
   zoom,
   playback,
-  timeline,
+  timeline: { timelineStartMs, recordingStartOffsetSeconds, goToRecordingStart },
 }: WavePlotViewProps) => {
   const { selection, onDragStart, onDragMove, onDragEnd } = zoom;
   const zoomSelection = selection ? getZoomSelection(selection) : null;
   const { playbackPosition } = playback;
-  const isProgressInGap = playbackPosition.currentTime < timeline.timeShift;
+  const isProgressInGap = playbackPosition.currentTime < recordingStartOffsetSeconds;
 
   return (
     <WavePlotContainer>
@@ -38,7 +38,11 @@ export const WavePlotView = ({
         onPointerUp={onDragEnd}
       >
         {playbackPosition.recordingStartPx > 0 && (
-          <RecordingGapOverlay timeline={timeline} recordingStartPx={playbackPosition.recordingStartPx} />
+          <RecordingGapOverlay
+            gapWidthPx={playbackPosition.recordingStartPx}
+            recordingStartClockTime={formatClockTime(timelineStartMs, recordingStartOffsetSeconds)}
+            onGoToRecording={goToRecordingStart}
+          />
         )}
         {zoomSelection && (
           <ZoomSelectionHighlight
@@ -50,7 +54,7 @@ export const WavePlotView = ({
         )}
         {!isProgressInGap && (
           <ProgressTimeTooltip style={{ left: playbackPosition.progressLinePx }}>
-            {formatClockTime(timeline.timelineStartMs, playbackPosition.currentTime)}
+            {formatClockTime(timelineStartMs, playbackPosition.currentTime)}
           </ProgressTimeTooltip>
         )}
       </WavePlotWrapper>

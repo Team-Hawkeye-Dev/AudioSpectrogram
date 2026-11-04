@@ -1,27 +1,26 @@
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import type { AudioSpectrogramTimelineControls } from "../../types";
-import { formatClockTime } from "../../utils/formatPlaybackTime";
 import { GoToRecordingButton, RecordingGapArea, RecordingGapText, RecordingStartTime } from "./RecordingGapOverlay.styles";
 
 interface RecordingGapOverlayProps {
-    timeline: AudioSpectrogramTimelineControls;
-    recordingStartPx: number;
+    gapWidthPx: number;
+    recordingStartClockTime: string;
+    onGoToRecording?: () => void;
 }
 
-export const RecordingGapOverlay = ({ timeline, recordingStartPx }: RecordingGapOverlayProps) => (
-    <RecordingGapArea style={{ width: recordingStartPx }} onPointerDown={(event) => event.stopPropagation()}>
+export const RecordingGapOverlay = ({ gapWidthPx, recordingStartClockTime, onGoToRecording }: RecordingGapOverlayProps) => (
+    <RecordingGapArea style={{ width: gapWidthPx }} onPointerDown={(event) => event.stopPropagation()}>
         <RecordingGapText variant="caption" color="text.secondary">
             No recording until
         </RecordingGapText>
         <RecordingStartTime variant="body2">
-            {formatClockTime(timeline.timelineStartMs, timeline.timeShift)}
+            {recordingStartClockTime}
         </RecordingStartTime>
-        {timeline.goToRecordingStart && (
+        {onGoToRecording && (
             <GoToRecordingButton
                 size="small"
                 variant="outlined"
                 endIcon={<ArrowForwardIcon />}
-                onClick={timeline.goToRecordingStart}
+                onClick={onGoToRecording}
             >
                 Go to recording
             </GoToRecordingButton>

@@ -149,7 +149,7 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
     detections,
     timeline: timelineStartMs === undefined ? undefined : {
       timelineStartMs,
-      timeShift,
+      recordingStartOffsetSeconds: timeShift,
       goToRecordingStart: timeShift > VISIBLE_WINDOW_SECONDS ? () => waveSurferInstanceRef.current?.setTime(timeShift) : undefined,
     },
     applyZoomView,
