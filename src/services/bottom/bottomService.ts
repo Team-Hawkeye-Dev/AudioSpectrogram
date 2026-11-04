@@ -3,7 +3,7 @@ import { createDemoRecordingTimes } from '../utils/demoRecordingTimes';
 import { generateRandomSoundData } from '../utils/randomSoundData';
 import { BOTTOM_DEMO_PICKING_LABEL_DATA } from './bottomDemoLabels';
 
-const BOTTOM_DEMO_START_DELAY_SECONDS = 10;
+const BOTTOM_DEMO_START_DELAY_SECONDS = 150;
 
 export const bottomService = {
   fetchSoundData: async (_request: { bottomGuid: string }): Promise<SoundDataResponse> => ({
