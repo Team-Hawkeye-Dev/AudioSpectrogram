@@ -1,5 +1,5 @@
 import { alpha, Box, Button, styled, Typography } from "@mui/material";
-import { RECORDING_GAP_BUTTON_MIN_WIDTH_PX, RECORDING_GAP_MESSAGE_MIN_WIDTH_PX, TIME_AXIS_HEIGHT_PX } from "../../consts";
+import { TIME_AXIS_HEIGHT_PX } from "../../consts";
 
 export const RecordingGapArea = styled(Box)(({ theme }) => ({
     position: 'absolute',
@@ -18,15 +18,15 @@ export const RecordingGapArea = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.background.default,
     backgroundImage: `repeating-linear-gradient(-45deg, ${alpha(theme.palette.text.primary, 0.05)} 0 ${theme.spacing(1)}, transparent ${theme.spacing(1)} ${theme.spacing(2)})`,
     borderRight: `${theme.spacing(0.25)} dashed ${theme.palette.text.secondary}`,
-    pointerEvents: 'none',
+    cursor: 'default',
     zIndex: theme.zIndex.mobileStepper
 }))
 
-export const RecordingGapText = styled(Typography)({
-    [`@container (max-width: ${RECORDING_GAP_MESSAGE_MIN_WIDTH_PX}px)`]: {
+export const RecordingGapText = styled(Typography)(({ theme }) => ({
+    [`@container (max-width: ${theme.spacing(12)})`]: {
         display: 'none'
     }
-})
+}))
 
 export const RecordingStartTime = styled(RecordingGapText)(({ theme }) => ({
     fontWeight: theme.typography.fontWeightBold
@@ -34,8 +34,7 @@ export const RecordingStartTime = styled(RecordingGapText)(({ theme }) => ({
 
 export const GoToRecordingButton = styled(Button)(({ theme }) => ({
     marginTop: theme.spacing(1),
-    pointerEvents: 'auto',
-    [`@container (max-width: ${RECORDING_GAP_BUTTON_MIN_WIDTH_PX}px)`]: {
+    [`@container (max-width: ${theme.spacing(22)})`]: {
         display: 'none'
     }
 }))

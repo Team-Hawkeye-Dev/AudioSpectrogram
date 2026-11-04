@@ -26,11 +26,13 @@ export const WavePlotView = ({
   const { selection, onDragStart, onDragMove, onDragEnd } = zoom;
   const zoomSelection = selection ? getZoomSelection(selection) : null;
   const { playbackPosition } = playback;
+  const isProgressInGap = playbackPosition.currentTime < timeline.timeShift;
 
   return (
     <WavePlotContainer>
       <WavePlotWrapper
         ref={spectrogramContainerRef}
+        hideProgressLine={isProgressInGap}
         onPointerDown={onDragStart}
         onPointerMove={onDragMove}
         onPointerUp={onDragEnd}
@@ -46,9 +48,11 @@ export const WavePlotView = ({
             }}
           />
         )}
-        <ProgressTimeTooltip style={{ left: playbackPosition.progressLinePx }}>
-          {formatClockTime(timeline.timelineStartMs, playbackPosition.currentTime)}
-        </ProgressTimeTooltip>
+        {!isProgressInGap && (
+          <ProgressTimeTooltip style={{ left: playbackPosition.progressLinePx }}>
+            {formatClockTime(timeline.timelineStartMs, playbackPosition.currentTime)}
+          </ProgressTimeTooltip>
+        )}
       </WavePlotWrapper>
     </WavePlotContainer>
   );

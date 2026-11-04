@@ -17,11 +17,6 @@ export interface AudioSpectrogramSource {
   earliestStartTimeMs: number | undefined;
 }
 
-export interface SpectrogramTimeline {
-  timelineStartMs: number;
-  recordingStartTime: number;
-}
-
 export interface SoundLabel {
   startTime: number;
   endTime: number;
@@ -53,7 +48,7 @@ export interface UseLabelRegionsProps {
   regionsPluginRef: RefObject<RegionsPlugin | null>;
   audioUrl: string | undefined;
   pickingLabelData: string | undefined;
-  recordingStartTime: number;
+  timeShift: number;
   isReadyAudio: boolean;
 }
 

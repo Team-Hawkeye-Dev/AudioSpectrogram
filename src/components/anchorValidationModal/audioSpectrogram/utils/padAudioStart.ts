@@ -1,3 +1,4 @@
+import Decoder from 'wavesurfer.js/dist/decoder.js';
 import { DECODE_SAMPLE_RATE_HZ, PADDED_AUDIO_MIME_TYPE } from '../consts/audioSpectrogram.consts';
 
 const WAV_HEADER_BYTES = 44;
@@ -29,7 +30,7 @@ const createWavHeader = (sampleCount: number, sampleRate: number): DataView<Arra
 
 export const padAudioStart = async (audioUrl: string, paddingSeconds: number): Promise<string> => {
   const audioData = await (await fetch(audioUrl)).arrayBuffer();
-  const audio = await new OfflineAudioContext(MONO_CHANNELS, 1, DECODE_SAMPLE_RATE_HZ).decodeAudioData(audioData);
+  const audio = await Decoder.decode(audioData, DECODE_SAMPLE_RATE_HZ);
   const paddingSamples = Math.round(paddingSeconds * audio.sampleRate);
   const samples = new Float32Array(paddingSamples + audio.length);
   samples.set(audio.getChannelData(0), paddingSamples);

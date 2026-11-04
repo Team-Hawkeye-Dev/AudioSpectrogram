@@ -9,19 +9,18 @@ interface RecordingGapOverlayProps {
 }
 
 export const RecordingGapOverlay = ({ timeline, recordingStartPx }: RecordingGapOverlayProps) => (
-    <RecordingGapArea style={{ width: recordingStartPx }}>
+    <RecordingGapArea style={{ width: recordingStartPx }} onPointerDown={(event) => event.stopPropagation()}>
         <RecordingGapText variant="caption" color="text.secondary">
             No recording until
         </RecordingGapText>
         <RecordingStartTime variant="body2">
-            {formatClockTime(timeline.timelineStartMs, timeline.recordingStartTime)}
+            {formatClockTime(timeline.timelineStartMs, timeline.timeShift)}
         </RecordingStartTime>
         {timeline.goToRecordingStart && (
             <GoToRecordingButton
                 size="small"
                 variant="outlined"
                 endIcon={<ArrowForwardIcon />}
-                onPointerDown={(event) => event.stopPropagation()}
                 onClick={timeline.goToRecordingStart}
             >
                 Go to recording

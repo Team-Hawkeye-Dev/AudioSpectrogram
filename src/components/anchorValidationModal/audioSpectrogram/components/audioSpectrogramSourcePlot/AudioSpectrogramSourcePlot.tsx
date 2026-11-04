@@ -1,10 +1,11 @@
 import { useAudioSpectrogramUrl } from "../../hooks/useAudioSpectrogramUrl"
 import { useAudioSpectrogramViewer } from "../../hooks/useAudioSpectrogramViewer"
-import { usePaddedAudioUrl } from "../../hooks/usePaddedAudioUrl"
+import { useTimeShiftedAudioUrl } from "../../hooks/useTimeShiftedAudioUrl"
 import { useZoomSelection } from "../../hooks/useZoomSelection"
+import { DEFAULT_TIME_SHIFT } from "../../consts/audioSpectrogram.consts"
 import type { AudioSpectrogramSource } from "../../types/audioSpectrogram.types"
-import { createSpectrogramTimeline } from "../../utils/createSpectrogramTimeline"
 import { AudioSpectrogramViewer } from "../../../../../core/components/spectrogram/audioSpectrogramViewer/AudioSpectrogramViewer"
+import { MS_PER_SECOND } from "../../../../../core/components/spectrogram/audioSpectrogramViewer/consts"
 
 export const AudioSpectrogramSourcePlot = ({
     audioGuid,
@@ -14,15 +15,17 @@ export const AudioSpectrogramSourcePlot = ({
     earliestStartTimeMs
 }: AudioSpectrogramSource) => {
     const { audioUrl, pickingLabelData, recordingStartTimeMs } = useAudioSpectrogramUrl(audioGuid, spectrogramType)
-    const timeline = createSpectrogramTimeline(recordingStartTimeMs, earliestStartTimeMs)
-    const paddedAudioUrl = usePaddedAudioUrl(audioUrl, timeline?.recordingStartTime)
-    const viewer = useAudioSpectrogramViewer(paddedAudioUrl, maxHz, spectrogramType, pickingLabelData, timeline)
+    const timeShift = recordingStartTimeMs !== undefined && earliestStartTimeMs !== undefined
+        ? (recordingStartTimeMs - earliestStartTimeMs) / MS_PER_SECOND
+        : undefined
+    const timeShiftedAudioUrl = useTimeShiftedAudioUrl(spectrogramType, audioGuid, audioUrl, timeShift)
+    const viewer = useAudioSpectrogramViewer(timeShiftedAudioUrl, maxHz, spectrogramType, pickingLabelData, earliestStartTimeMs, timeShift ?? DEFAULT_TIME_SHIFT)
     const zoom = useZoomSelection(viewer)
-    const { spectrogramContainerRef, isPlaying, detections, timeline: timelineControls, isReadyAudio, togglePlay, playbackPosition} = viewer 
+    const { spectrogramContainerRef, isPlaying, detections, timeline, isReadyAudio, togglePlay, playbackPosition} = viewer 
 
     return (
         <>
-            {audioUrl && timelineControls && (<AudioSpectrogramViewer
+            {audioUrl && timeline && (<AudioSpectrogramViewer
             maxHz={maxHz}
             stepHz={stepHz}
             spectrogramContainerRef={spectrogramContainerRef}
@@ -30,7 +33,7 @@ export const AudioSpectrogramSourcePlot = ({
             zoom={zoom}
             playback={{ isPlaying, togglePlay, playbackPosition }}
             detections={detections}
-            timeline={timelineControls}
+            timeline={timeline}
         />)}
         </>
     )

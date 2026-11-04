@@ -9,13 +9,18 @@ export const WavePlotContainer = styled(Box)({
     overflow: 'hidden'
 })
 
-export const WavePlotWrapper = styled(Box)({
+export const WavePlotWrapper = styled(Box, {
+    shouldForwardProp: (prop) => prop !== 'hideProgressLine'
+})<{ hideProgressLine: boolean }>(({ hideProgressLine }) => ({
     position: 'relative',
     width: '100%',
     flex: 1,
     minHeight: 0,
-    cursor: 'crosshair'
-})
+    cursor: 'crosshair',
+    '& ::part(cursor)': {
+        visibility: hideProgressLine ? 'hidden' : 'visible'
+    }
+}))
 
 export const ZoomSelectionHighlight = styled(Box)(({theme}) => ({
     position: 'absolute',
