@@ -38,6 +38,11 @@ export const INITIAL_PLAYBACK_POSITION: PlaybackPosition = { currentTime: 0, pro
 
 export type SpectrogramType = (typeof SpectrogramType)[keyof typeof SpectrogramType];
 
+export const SPECTROGRAM_TITLE: Record<SpectrogramType, string> = {
+    [SpectrogramType.TOP]: 'Top',
+    [SpectrogramType.BOTTOM]: 'Bottom'
+};
+
 export const PICKING_LABEL_LINE_SEPARATOR = '\n';
 export const PICKING_LABEL_FIELD_SEPARATOR = '\t';
 

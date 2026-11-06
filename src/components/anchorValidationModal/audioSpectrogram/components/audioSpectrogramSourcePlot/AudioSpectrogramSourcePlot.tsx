@@ -1,6 +1,7 @@
 import { useAudioSpectrogramUrl } from "../../hooks/useAudioSpectrogramUrl"
 import { useAudioSpectrogramViewer } from "../../hooks/useAudioSpectrogramViewer"
 import { useZoomSelection } from "../../hooks/useZoomSelection"
+import { SPECTROGRAM_TITLE } from "../../consts/audioSpectrogram.consts"
 import type { AudioSpectrogramSource } from "../../types/audioSpectrogram.types"
 import { AudioSpectrogramViewer } from "../../../../../core/components/spectrogram/audioSpectrogramViewer/AudioSpectrogramViewer"
 
@@ -18,6 +19,7 @@ export const AudioSpectrogramSourcePlot = ({
     return (
         <>
             {audioUrl && (<AudioSpectrogramViewer
+            title={SPECTROGRAM_TITLE[spectrogramType]}
             maxHz={maxHz}
             stepHz={stepHz}
             spectrogramContainerRef={spectrogramContainerRef}

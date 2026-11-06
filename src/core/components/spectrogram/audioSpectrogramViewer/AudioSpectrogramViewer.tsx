@@ -1,4 +1,5 @@
 import { FrequencyLabels } from "./components/frequencyLabels/FrequencyLabels";
+import { SpectrogramHeader } from "./components/spectrogramHeader/SpectrogramHeader";
 import { SpectrogramControlsRow } from "./components/spectrogramControlsRow/SpectrogramControlsRow";
 import { WavePlotView } from "./components/wavePlotView/WavePlotView";
 import {
@@ -9,6 +10,7 @@ import {
 import type { AudioSpectrogramViewerProps } from "./types";
 
 export const AudioSpectrogramViewer = ({
+  title,
   maxHz,
   stepHz,
   spectrogramContainerRef,
@@ -19,6 +21,7 @@ export const AudioSpectrogramViewer = ({
 }: AudioSpectrogramViewerProps) => (
   <SpectrogramViewerRootContainer>
     <SpectrogramRowContainer>
+      <SpectrogramHeader title={title} />
       <SpectrogramPlotRow>
         <FrequencyLabels maxHz={maxHz} stepHz={stepHz} />
         <WavePlotView spectrogramContainerRef={spectrogramContainerRef} zoom={zoom} playback={playback} />

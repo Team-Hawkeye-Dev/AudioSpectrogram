@@ -31,6 +31,7 @@ export interface AudioSpectrogramDetectionControls {
 }
 
 export interface AudioSpectrogramViewerProps {
+    title: string;
     maxHz: number;
     stepHz: number;
     spectrogramContainerRef: RefObject<HTMLDivElement | null>;
