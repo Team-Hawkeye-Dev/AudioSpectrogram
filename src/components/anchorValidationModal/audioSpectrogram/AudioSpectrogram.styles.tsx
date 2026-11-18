@@ -6,6 +6,7 @@ export const AnchorValidationModalContainer = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   padding: theme.spacing(2),
   flex: 1,
+  minHeight: 0,
 }));
 
 export const SpectrogramTitle = styled(Typography)(({ theme }) => ({
@@ -38,6 +39,8 @@ export const SpectrogramPlotGroup = styled(Box, {
   flexDirection: 'column',
   gap: theme.spacing(2),
   width: '100%',
+  flex: 1, 
+  minHeight: 0,
   opacity: ready ? 1 : 0,
   pointerEvents: ready ? 'auto' : 'none',
   transition: theme.transitions.create("opacity", {
