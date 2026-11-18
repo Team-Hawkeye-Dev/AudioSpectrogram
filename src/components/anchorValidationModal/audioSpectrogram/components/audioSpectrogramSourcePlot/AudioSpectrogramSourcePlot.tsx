@@ -18,7 +18,7 @@ export const AudioSpectrogramSourcePlot = ({
 
     return (
         <>
-            {audioUrl && (<AudioSpectrogramViewer
+            {audioGuid && (<AudioSpectrogramViewer
             title={SPECTROGRAM_TITLE[spectrogramType]}
             maxHz={maxHz}
             stepHz={stepHz}
