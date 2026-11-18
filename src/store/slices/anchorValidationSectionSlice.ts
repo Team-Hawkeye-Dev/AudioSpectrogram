@@ -13,6 +13,11 @@ export type SpectrogramWindow = {
     currentEndTime: number;
 };
 
+export type SyncedSpectrogramView = {
+    startTime: number;
+    visibleSeconds: number;
+};
+
 export type AnchorValidationSlice = {
     isAnchorValidationModalOpen: boolean;
     setIsAnchorValidationModalOpen: (open: boolean) => void;
@@ -28,6 +33,10 @@ export type AnchorValidationSlice = {
     ) => void;
     spectrogramAudioDuration: Record<SpectrogramType, number>;
     setSpectrogramAudioDuration: (spectrogramPlotType: SpectrogramType, audioDuration: number) => void;
+    isSpectrogramSyncEnabled: boolean;
+    setIsSpectrogramSyncEnabled: (isEnabled: boolean) => void;
+    syncedSpectrogramView: SyncedSpectrogramView | null;
+    setSyncedSpectrogramView: (syncedView: SyncedSpectrogramView) => void;
 };
 
 export const expandSectionSlice: StateCreator<MassiviAppState, [], [], AnchorValidationSlice> = (set) => ({
@@ -70,5 +79,21 @@ export const expandSectionSlice: StateCreator<MassiviAppState, [], [], AnchorVal
                     [spectrogramPlotType]: audioDuration
                 }
             }))
+        ),
+
+    isSpectrogramSyncEnabled: false,
+    setIsSpectrogramSyncEnabled: (isEnabled) =>
+        set(
+            updateSlice(StoreSlices.ANCHOR_VALIDATION_SECTION, {
+                isSpectrogramSyncEnabled: isEnabled
+            })
+        ),
+
+    syncedSpectrogramView: null,
+    setSyncedSpectrogramView: (syncedView) =>
+        set(
+            updateSlice(StoreSlices.ANCHOR_VALIDATION_SECTION, {
+                syncedSpectrogramView: syncedView
+            })
         )
 });
