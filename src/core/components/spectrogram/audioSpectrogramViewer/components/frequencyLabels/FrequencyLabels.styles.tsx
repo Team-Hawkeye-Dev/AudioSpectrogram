@@ -5,6 +5,7 @@ export const FrequencyLabelList = styled(Box)(({theme}) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
+    height: '33vh',
     padding: theme.spacing(0.5, 1, 0.5, 0),
     paddingBottom: TIME_AXIS_HEIGHT_PX
 }))
