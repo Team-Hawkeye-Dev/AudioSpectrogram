@@ -6,6 +6,7 @@ export const AnchorValidationModalContainer = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   padding: theme.spacing(2),
   flex: 1,
+  minHeight: 0,
 }));
 
 export const SpectrogramTitle = styled(Typography)(({ theme }) => ({
