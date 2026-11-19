@@ -18,7 +18,7 @@ interface SpectrogramControlsRowProps {
     isReadyAudio: boolean;
 }
 
-export const SpectrogramControlsRow = ({ zoom, playback, detections, sync, isReadyAudio }: SpectrogramControlsRowProps) => (
+export const SpectrogramControlsRow = ({ zoom, playback, detections, sync: { isSynced, toggleSync }, isReadyAudio }: SpectrogramControlsRowProps) => (
     <SpectrogramControlsArea>
         <PlayPauseButton playback={playback} isReadyAudio={isReadyAudio} />
         <ViewActions>
@@ -31,12 +31,12 @@ export const SpectrogramControlsRow = ({ zoom, playback, detections, sync, isRea
                 Reset zoom
             </ResetZoomButton>
             <SyncButton
-                isSynced={sync.isSynced}
-                onClick={sync.toggleSync}
+                isSynced={isSynced}
+                onClick={toggleSync}
                 disabled={!isReadyAudio}
                 size="small"
                 startIcon={<SyncIcon fontSize="small" />}
-                aria-pressed={sync.isSynced}
+                aria-pressed={isSynced}
             >
                 Sync
             </SyncButton>
