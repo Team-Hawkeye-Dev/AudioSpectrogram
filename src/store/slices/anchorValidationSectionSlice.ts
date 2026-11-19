@@ -44,7 +44,11 @@ export const expandSectionSlice: StateCreator<MassiviAppState, [], [], AnchorVal
     setIsAnchorValidationModalOpen: (open) =>
         set(
             updateSlice(StoreSlices.ANCHOR_VALIDATION_SECTION, {
-                isAnchorValidationModalOpen: open
+                isAnchorValidationModalOpen: open, 
+                ...(open ? {} : {
+                    isSpectrogramSyncEnabled: false,
+                    syncedSpectrogramView: null,
+                }),
             })
         ),
 
