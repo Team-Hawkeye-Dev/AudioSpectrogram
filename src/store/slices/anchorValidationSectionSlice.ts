@@ -13,6 +13,11 @@ export type SpectrogramWindow = {
     currentEndTime: number;
 };
 
+export type SyncedSpectrogramView = {
+    startTime: number;
+    visibleSeconds: number;
+};
+
 export type AnchorValidationSlice = {
     isAnchorValidationModalOpen: boolean;
     setIsAnchorValidationModalOpen: (open: boolean) => void;
@@ -28,6 +33,10 @@ export type AnchorValidationSlice = {
     ) => void;
     spectrogramAudioDuration: Record<SpectrogramType, number>;
     setSpectrogramAudioDuration: (spectrogramPlotType: SpectrogramType, audioDuration: number) => void;
+    isSpectrogramSyncEnabled: boolean;
+    setIsSpectrogramSyncEnabled: (isEnabled: boolean) => void;
+    syncedSpectrogramView: SyncedSpectrogramView | null;
+    setSyncedSpectrogramView: (syncedView: SyncedSpectrogramView | null) => void;
 };
 
 export const expandSectionSlice: StateCreator<MassiviAppState, [], [], AnchorValidationSlice> = (set) => ({
@@ -35,7 +44,11 @@ export const expandSectionSlice: StateCreator<MassiviAppState, [], [], AnchorVal
     setIsAnchorValidationModalOpen: (open) =>
         set(
             updateSlice(StoreSlices.ANCHOR_VALIDATION_SECTION, {
-                isAnchorValidationModalOpen: open
+                isAnchorValidationModalOpen: open, 
+                ...(open ? {} : {
+                    isSpectrogramSyncEnabled: true,
+                    syncedSpectrogramView: null,
+                }),
             })
         ),
 
@@ -70,5 +83,21 @@ export const expandSectionSlice: StateCreator<MassiviAppState, [], [], AnchorVal
                     [spectrogramPlotType]: audioDuration
                 }
             }))
+        ),
+
+    isSpectrogramSyncEnabled: true,
+    setIsSpectrogramSyncEnabled: (isEnabled) =>
+        set(
+            updateSlice(StoreSlices.ANCHOR_VALIDATION_SECTION, {
+                isSpectrogramSyncEnabled: isEnabled
+            })
+        ),
+
+    syncedSpectrogramView: null,
+    setSyncedSpectrogramView: (syncedView) =>
+        set(
+            updateSlice(StoreSlices.ANCHOR_VALIDATION_SECTION, {
+                syncedSpectrogramView: syncedView
+            })
         )
 });
