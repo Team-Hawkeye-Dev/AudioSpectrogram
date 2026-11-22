@@ -36,7 +36,7 @@ export type AnchorValidationSlice = {
     isSpectrogramSyncEnabled: boolean;
     setIsSpectrogramSyncEnabled: (isEnabled: boolean) => void;
     syncedSpectrogramView: SyncedSpectrogramView | null;
-    setSyncedSpectrogramView: (syncedView: SyncedSpectrogramView) => void;
+    setSyncedSpectrogramView: (syncedView: SyncedSpectrogramView | null) => void;
 };
 
 export const expandSectionSlice: StateCreator<MassiviAppState, [], [], AnchorValidationSlice> = (set) => ({

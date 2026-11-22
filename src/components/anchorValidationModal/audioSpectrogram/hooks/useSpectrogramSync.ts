@@ -60,11 +60,16 @@ export const useSpectrogramSync = ({
     const waveSurfer = waveSurferInstanceRef.current;
     if (!isSyncActive || !waveSurfer) return;
 
-    const shareVisibleView = () => requestAnimationFrame(() => setSyncedView(getVisibleView(waveSurfer)));
+    let frame = 0;
+    const shareVisibleView = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => setSyncedView(getVisibleView(waveSurfer)));
+    } 
     const unsubscribeScroll = setWaveSurferScrollCallback(waveSurfer, shareVisibleView);
     const unsubscribeZoom = setWaveSurferZoomCallback(waveSurfer, shareVisibleView);
 
     return () => {
+      cancelAnimationFrame(frame)
       unsubscribeScroll();
       unsubscribeZoom();
     };
