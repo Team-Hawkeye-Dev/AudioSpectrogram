@@ -53,6 +53,11 @@ export interface AudioSpectrogramDetectionControls {
     goToNextDetection: () => void;
 }
 
+export interface AudioSpectrogramSyncControls {
+    isSynced: boolean;
+    toggleSync: () => void;
+}
+
 export interface AudioSpectrogramViewerProps {
     title: string;
     maxHz: number;
@@ -62,5 +67,6 @@ export interface AudioSpectrogramViewerProps {
     measure: AudioSpectrogramMeasureControls;
     playback: AudioSpectrogramPlaybackControls;
     detections: AudioSpectrogramDetectionControls;
+    sync: AudioSpectrogramSyncControls;
     isReadyAudio: boolean;
 }

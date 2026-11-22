@@ -1,4 +1,4 @@
-import type { PointerEvent, RefObject } from "react";
+import type { RefObject } from "react";
 import type {
   AudioSpectrogramMeasureControls,
   AudioSpectrogramPlaybackControls,
@@ -37,19 +37,19 @@ export const WavePlotView = ({
       <WavePlotWrapper
         ref={spectrogramContainerRef}
         onPointerDown={(event) => {
-           if (event.ctrlKey) {
-      onMeasureStart(event);
-      return;
-    }
-    onDragStart(event);
+          if (event.ctrlKey) {
+            onMeasureStart(event);
+            return;
+          }
+          onDragStart(event);
         }}
         onPointerMove={(event) => {
           onDragMove(event);
-    onMeasureMove(event);
+          onMeasureMove(event);
         }}
         onPointerUp={(event) => {
           onDragEnd(event);
-    onMeasureEnd();
+          onMeasureEnd();
         }}
       >
         {zoomSelection && (

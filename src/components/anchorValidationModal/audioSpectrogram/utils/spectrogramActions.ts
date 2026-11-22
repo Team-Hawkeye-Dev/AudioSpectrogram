@@ -65,6 +65,12 @@ export const renderEveryTimeLabel = (timeLinePlugin: TimelinePlugin) => {
 export const setWaveSurferPlayCallback = (waveSurfer: WaveSurfer, onPlay: () => void): (() => void) =>
   waveSurfer.on('play', onPlay)
 
+export const setWaveSurferScrollCallback = (waveSurfer: WaveSurfer, onScroll: () => void): (() => void) =>
+  waveSurfer.on('scroll', onScroll)
+
+export const setWaveSurferZoomCallback = (waveSurfer: WaveSurfer, onZoom: () => void): (() => void) =>
+  waveSurfer.on('zoom', onZoom)
+
 export const onSpectrogramPlayback = (
   waveSurfer: WaveSurfer,
   setIsPlaying: (isPlaying: boolean) => void,
@@ -81,8 +87,8 @@ export const onSpectrogramPlayback = (
   waveSurfer.on('pause', () => setIsPlaying(false))
   waveSurfer.on('finish', () => setIsPlaying(false))
   waveSurfer.on('timeupdate', updatePlaybackPosition)
-  waveSurfer.on('scroll', updatePlaybackPosition)
-  waveSurfer.on('zoom', updatePlaybackPosition)
+  setWaveSurferScrollCallback(waveSurfer, updatePlaybackPosition)
+  setWaveSurferZoomCallback(waveSurfer, updatePlaybackPosition)
 }
 
 export const scrollRegionIntoView = (waveSurfer: WaveSurfer, region: Region, containerWidthPx: number) => {

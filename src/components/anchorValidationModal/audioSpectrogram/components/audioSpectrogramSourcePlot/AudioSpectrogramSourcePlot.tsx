@@ -3,6 +3,7 @@ import { useAudioSpectrogramViewer } from "../../hooks/useAudioSpectrogramViewer
 import { useZoomSelection } from "../../hooks/useZoomSelection"
 import { useMeasureSelection } from "../../hooks/useMeasureSelection"
 import { SPECTROGRAM_TITLE } from "../../consts/audioSpectrogram.consts"
+import { useSpectrogramSync } from "../../hooks/useSpectrogramSync"
 import type { AudioSpectrogramSource } from "../../types/audioSpectrogram.types"
 import { AudioSpectrogramViewer } from "../../../../../core/components/spectrogram/audioSpectrogramViewer/AudioSpectrogramViewer"
 
@@ -16,7 +17,8 @@ export const AudioSpectrogramSourcePlot = ({
     const viewer = useAudioSpectrogramViewer(audioUrl, maxHz, spectrogramType, pickingLabelData)
     const zoom = useZoomSelection(viewer)
     const measure = useMeasureSelection({ ...viewer, maxFrequencyHz: maxHz })
-    const { spectrogramContainerRef, isPlaying, detections, isReadyAudio, togglePlay, playbackPosition} = viewer 
+    const sync = useSpectrogramSync({ ...viewer, resetZoom: zoom.resetZoom })
+    const { spectrogramContainerRef, isPlaying, detections, isReadyAudio, togglePlay, playbackPosition } = viewer 
 
     return (
         <>
@@ -30,6 +32,7 @@ export const AudioSpectrogramSourcePlot = ({
             measure={measure}
             playback={{ isPlaying, togglePlay, playbackPosition }}
             detections={detections}
+            sync={sync}
         />)}
         </>
     )
