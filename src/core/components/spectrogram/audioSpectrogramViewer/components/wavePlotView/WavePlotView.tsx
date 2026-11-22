@@ -28,7 +28,7 @@ export const WavePlotView = ({
   playback,
 }: WavePlotViewProps) => {
   const { selection, onDragStart, onDragMove, onDragEnd } = zoom;
-  const { measureArea, measureBox, onMeasureStart, onMeasureMove, onMeasureEnd } = measure;
+  const { measureArea, measureBox, isMeasuring, onMeasureStart, onMeasureMove, onMeasureEnd } = measure;
   const zoomSelection = selection ? getZoomSelection(selection) : null;
   const { playbackPosition } = playback;
 
@@ -66,7 +66,9 @@ export const WavePlotView = ({
             }}
           />
         )}
-        {measureArea && measureBox && <MeasureSelection measureArea={measureArea} measureBox={measureBox} />}
+        {measureArea && measureBox && (
+          <MeasureSelection measureArea={measureArea} measureBox={measureBox} isMeasuring={isMeasuring} />
+        )}
         <ProgressTimeTooltip style={{ left: playbackPosition.progressLinePx }}>
           {timeFormat(playbackPosition.currentTime)}
         </ProgressTimeTooltip>

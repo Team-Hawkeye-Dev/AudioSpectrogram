@@ -23,12 +23,13 @@ export const MeasureTooltip = styled(({ className, ...props }: TooltipProps) => 
         padding: theme.spacing(1, 1.5),
         borderRadius: theme.shape.borderRadius,
         border: `1px solid ${theme.palette.divider}`,
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: alpha(theme.palette.background.paper, 0.7),
+        backdropFilter: 'blur(6px)',
         color: theme.palette.text.primary,
         boxShadow: theme.shadows[8]
     },
     [`& .${tooltipClasses.arrow}`]: {
-        color: theme.palette.background.paper,
+        color: alpha(theme.palette.background.paper, 0.7),
         '&::before': {
             border: `1px solid ${theme.palette.divider}`
         }
@@ -37,8 +38,8 @@ export const MeasureTooltip = styled(({ className, ...props }: TooltipProps) => 
 
 export const MeasureStatsGrid = styled(Box)(({theme}) => ({
     display: 'grid',
-    gridTemplateColumns: 'auto auto auto',
-    columnGap: theme.spacing(2),
+    gridTemplateColumns: 'auto auto',
+    columnGap: theme.spacing(1.5),
     rowGap: theme.spacing(0.5),
     alignItems: 'baseline'
 }))
@@ -53,6 +54,5 @@ export const MeasureStatsHeading = styled(Typography)(({theme}) => ({
 export const MeasureStatsValue = styled(Typography)(({theme}) => ({
     fontSize: theme.typography.body2.fontSize,
     fontWeight: theme.typography.fontWeightMedium,
-    fontVariantNumeric: 'tabular-nums',
-    textAlign: 'right'
+    fontVariantNumeric: 'tabular-nums'
 }))

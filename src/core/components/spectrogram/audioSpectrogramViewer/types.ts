@@ -30,6 +30,7 @@ export interface MeasureBox {
 export interface AudioSpectrogramMeasureControls {
     measureArea: MeasureArea | null;
     measureBox: MeasureBox | null;
+    isMeasuring: boolean;
     onMeasureStart: (event: PointerEvent<HTMLDivElement>) => void;
     onMeasureMove: (event: PointerEvent<HTMLDivElement>) => void;
     onMeasureEnd: (event: PointerEvent<HTMLDivElement>) => void;

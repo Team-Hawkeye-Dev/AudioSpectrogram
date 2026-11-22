@@ -87,6 +87,7 @@ export const useMeasureSelection = ({
   const measureArea = useMassiviAppStore((state) => state.anchorValidationSection.spectrogramMeasureAreas[spectrogramPlotType]);
   const setMeasureArea = useMassiviAppStore((state) => state.anchorValidationSection.setSpectrogramMeasureArea);
   const [measureBox, setMeasureBox] = useState<MeasureBox | null>(null);
+  const [isMeasuring, setIsMeasuring] = useState(false);
   const startPointRef = useRef<PlotPoint | null>(null);
 
   useEffect(() => {
@@ -122,12 +123,14 @@ export const useMeasureSelection = ({
 
     const spectrogramHeightPx = getSpectrogramHeightPx(event.currentTarget);
     setMeasureArea(spectrogramPlotType, pointsToMeasureArea(startPoint, endPoint, waveSurfer, spectrogramHeightPx, maxFrequencyHz));
+    setIsMeasuring(true);
   };
 
   const onMeasureEnd = (event: PointerEvent<HTMLDivElement>) => {
     onMeasureMove(event);
     startPointRef.current = null;
+    setIsMeasuring(false);
   };
 
-  return { measureArea, measureBox, onMeasureStart, onMeasureMove, onMeasureEnd };
+  return { measureArea, measureBox, isMeasuring, onMeasureStart, onMeasureMove, onMeasureEnd };
 };
