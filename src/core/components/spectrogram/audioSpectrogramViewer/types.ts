@@ -33,7 +33,7 @@ export interface AudioSpectrogramMeasureControls {
     isMeasuring: boolean;
     onMeasureStart: (event: PointerEvent<HTMLDivElement>) => void;
     onMeasureMove: (event: PointerEvent<HTMLDivElement>) => void;
-    onMeasureEnd: (event: PointerEvent<HTMLDivElement>) => void;
+    onMeasureEnd: () => void;
 }
 
 export interface PlaybackPosition {

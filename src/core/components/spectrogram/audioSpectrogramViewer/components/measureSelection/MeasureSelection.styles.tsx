@@ -1,4 +1,4 @@
-import { alpha, Box, styled, Tooltip, tooltipClasses, Typography, type TooltipProps } from "@mui/material";
+import { alpha, Box, styled, Tooltip, tooltipClasses, type TooltipProps } from "@mui/material";
 
 export const MeasureSelectionBox = styled(Box)(({theme}) => ({
     position: 'absolute',
@@ -34,35 +34,4 @@ export const MeasureTooltip = styled(({ className, ...props }: TooltipProps) => 
             border: `1px solid ${theme.palette.divider}`
         }
     }
-}))
-
-export const MeasureStatsGrid = styled(Box)(({theme}) => ({
-    display: 'grid',
-    gridTemplateColumns: 'auto auto auto',
-    columnGap: theme.spacing(1.5),
-    rowGap: theme.spacing(0.5),
-    alignItems: 'center'
-}))
-
-export const MeasureStatsHeading = styled(Typography)(({theme}) => ({
-    fontSize: theme.typography.overline.fontSize,
-    letterSpacing: theme.typography.overline.letterSpacing,
-    textTransform: 'uppercase',
-    color: theme.palette.text.secondary
-}))
-
-export const MeasureStatsValue = styled(Typography)(({theme}) => ({
-    fontSize: theme.typography.body2.fontSize,
-    fontWeight: theme.typography.fontWeightMedium,
-    fontVariantNumeric: 'tabular-nums'
-}))
-
-export const MeasureStatsDifference = styled(MeasureStatsValue)(({theme}) => ({
-    textAlign: 'center',
-    padding: theme.spacing(0.25, 0.75),
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.success.main, 0.16),
-    color: theme.palette.success.main,
-    fontSize: theme.typography.caption.fontSize,
-    whiteSpace: 'nowrap'
 }))

@@ -47,7 +47,7 @@ export const WavePlotView = ({
 
   const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
     onDragEnd(event);
-    onMeasureEnd(event);
+    onMeasureEnd();
   };
 
   return (
