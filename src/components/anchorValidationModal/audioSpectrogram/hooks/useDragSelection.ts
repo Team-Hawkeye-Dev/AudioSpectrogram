@@ -1,7 +1,7 @@
 import { useCallback, useState, useRef, type PointerEvent } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 import { useSnackbar } from 'notistack';
-import { CLICK_MAX_DRAG_PX, CONTAINER_CENTER_RATIO, DRAG_ZOOM_OUT_FACTOR, LEFT_MOUSE_BUTTON, MAX_ZOOM_CANVAS_PX, MAX_ZOOM_VISIBLE_SECONDS, MIN_ZOOM_SELECTION_PX } from '../consts/audioSpectrogram.consts';
+import { CLICK_MAX_DRAG_PX, CONTAINER_CENTER_RATIO, DRAG_ZOOM_OUT_FACTOR, MAX_ZOOM_CANVAS_PX, MAX_ZOOM_VISIBLE_SECONDS, MIN_ZOOM_SELECTION_PX } from '../consts/audioSpectrogram.consts';
 import type { SpectrogramInteractionContext } from '../types/audioSpectrogram.types';
 import { useMassiviAppStore } from '../../../../store/useStore';
 
@@ -15,6 +15,8 @@ interface UseDragSelectionProps extends SpectrogramInteractionContext {
     onZoomIn: (minPxPerSec: number, scrollTime: number) => void
     onZoomOut: (minPxPerSec: number, scrollTime: number) => void
 }
+
+const LEFT_MOUSE_CLICK = 0
 
 export const useDragSelection = ({
 spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudio, minZoomPxPerSec, onZoomIn, onZoomOut
@@ -46,7 +48,7 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
     }, [])
 
     const onDragStart = (event: PointerEvent<HTMLDivElement>) => {
-        if (!isReadyAudio || event.button !== LEFT_MOUSE_BUTTON) return
+        if (!isReadyAudio || event.button !== LEFT_MOUSE_CLICK) return
         const startPx = event.clientX - getRect(event.currentTarget).left
         startPxRef.current = startPx
         setSelection({startPx, currentPx: startPx})

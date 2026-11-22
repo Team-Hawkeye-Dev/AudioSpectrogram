@@ -9,7 +9,6 @@ export const DRAG_ZOOM_OUT_FACTOR = 2;
 export const CONTAINER_CENTER_RATIO = 0.5;
 export const MIN_ZOOM_SELECTION_PX = 50;
 export const CLICK_MAX_DRAG_PX = 2;
-export const LEFT_MOUSE_BUTTON = 0;
 
 export const MAX_ZOOM_VISIBLE_SECONDS = 5;
 export const MAX_ZOOM_CANVAS_PX = 60000;
