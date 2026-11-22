@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { Instance as PopperInstance } from "@popperjs/core";
 import type { MeasureArea, MeasureBox } from "../../types";
-import { formatMeasureFrequency, formatMeasureTime } from "../../utils/formatMeasureValues";
+import { formatMeasureDuration, formatMeasureFrequency, formatMeasureTime } from "../../utils/formatMeasureValues";
 import {
   MeasureSelectionBox,
+  MeasureStatsDifference,
   MeasureStatsGrid,
   MeasureStatsHeading,
   MeasureStatsValue,
@@ -16,19 +17,26 @@ interface MeasureSelectionProps {
   isMeasuring: boolean;
 }
 
-const MeasureStats = ({ measureArea }: { measureArea: MeasureArea }) => (
-  <MeasureStatsGrid>
-    <MeasureStatsHeading>Time</MeasureStatsHeading>
-    <MeasureStatsValue>
-      {formatMeasureTime(measureArea.startTimeSeconds)} → {formatMeasureTime(measureArea.endTimeSeconds)}
-    </MeasureStatsValue>
+const MeasureStats = ({ measureArea }: { measureArea: MeasureArea }) => {
+  const durationSeconds = measureArea.endTimeSeconds - measureArea.startTimeSeconds;
+  const bandwidthHz = measureArea.endFrequencyHz - measureArea.startFrequencyHz;
 
-    <MeasureStatsHeading>Freq</MeasureStatsHeading>
-    <MeasureStatsValue>
-      {formatMeasureFrequency(measureArea.startFrequencyHz)} → {formatMeasureFrequency(measureArea.endFrequencyHz)}
-    </MeasureStatsValue>
-  </MeasureStatsGrid>
-);
+  return (
+    <MeasureStatsGrid>
+      <MeasureStatsHeading>Time</MeasureStatsHeading>
+      <MeasureStatsValue>
+        {formatMeasureTime(measureArea.startTimeSeconds)} → {formatMeasureTime(measureArea.endTimeSeconds)}
+      </MeasureStatsValue>
+      <MeasureStatsDifference>Δ {formatMeasureDuration(durationSeconds)}</MeasureStatsDifference>
+
+      <MeasureStatsHeading>Freq</MeasureStatsHeading>
+      <MeasureStatsValue>
+        {formatMeasureFrequency(measureArea.startFrequencyHz)} → {formatMeasureFrequency(measureArea.endFrequencyHz)}
+      </MeasureStatsValue>
+      <MeasureStatsDifference>Δ {formatMeasureFrequency(bandwidthHz)}</MeasureStatsDifference>
+    </MeasureStatsGrid>
+  );
+};
 
 export const MeasureSelection = ({ measureArea, measureBox, isMeasuring }: MeasureSelectionProps) => {
   const [isHovered, setIsHovered] = useState(false);

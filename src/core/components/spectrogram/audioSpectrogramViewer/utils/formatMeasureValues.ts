@@ -18,3 +18,6 @@ export const formatMeasureTime = (seconds: number): string => {
 
 export const formatMeasureFrequency = (hz: number): string =>
     `${(hz / FREQUENCY_STEP).toFixed(MEASURE_FREQUENCY_DECIMALS)} kHz`;
+
+export const formatMeasureDuration = (seconds: number): string =>
+    `${seconds.toFixed(MEASURE_TIME_DECIMALS)} s`;

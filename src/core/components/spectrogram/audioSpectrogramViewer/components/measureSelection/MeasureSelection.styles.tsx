@@ -38,10 +38,10 @@ export const MeasureTooltip = styled(({ className, ...props }: TooltipProps) => 
 
 export const MeasureStatsGrid = styled(Box)(({theme}) => ({
     display: 'grid',
-    gridTemplateColumns: 'auto auto',
+    gridTemplateColumns: 'auto auto auto',
     columnGap: theme.spacing(1.5),
     rowGap: theme.spacing(0.5),
-    alignItems: 'baseline'
+    alignItems: 'center'
 }))
 
 export const MeasureStatsHeading = styled(Typography)(({theme}) => ({
@@ -55,4 +55,16 @@ export const MeasureStatsValue = styled(Typography)(({theme}) => ({
     fontSize: theme.typography.body2.fontSize,
     fontWeight: theme.typography.fontWeightMedium,
     fontVariantNumeric: 'tabular-nums'
+}))
+
+export const MeasureStatsDifference = styled(Typography)(({theme}) => ({
+    textAlign: 'center',
+    padding: theme.spacing(0.25, 0.75),
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.success.main, 0.16),
+    color: theme.palette.success.main,
+    fontSize: theme.typography.caption.fontSize,
+    fontWeight: theme.typography.fontWeightMedium,
+    fontVariantNumeric: 'tabular-nums',
+    whiteSpace: 'nowrap'
 }))
