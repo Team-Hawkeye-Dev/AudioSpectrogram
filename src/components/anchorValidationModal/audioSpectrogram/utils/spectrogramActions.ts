@@ -92,3 +92,12 @@ export const scrollRegionIntoView = (waveSurfer: WaveSurfer, region: Region, con
   const isRegionVisible = region.start >= visibleStartTime && region.end <= visibleEndTime
   if (!isRegionVisible) waveSurfer.setScrollTime(region.start)
 }
+
+export const onSpectrogramViewChange = (waveSurfer: WaveSurfer, onViewChange: () => void): (() => void) => {
+  const unsubscribeScroll = waveSurfer.on('scroll', onViewChange)
+  const unsubscribeZoom = waveSurfer.on('zoom', onViewChange)
+  return () => {
+    unsubscribeScroll()
+    unsubscribeZoom()
+  }
+}

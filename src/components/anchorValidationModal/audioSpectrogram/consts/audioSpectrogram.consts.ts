@@ -1,4 +1,4 @@
-import type { PlaybackPosition } from "../../../../core/components/spectrogram/audioSpectrogramViewer/types";
+import type { MeasureArea, PlaybackPosition } from "../../../../core/components/spectrogram/audioSpectrogramViewer/types";
 import type { SpectrogramWindow } from "../../../../store/slices/anchorValidationSectionSlice";
 
 export const VISIBLE_WINDOW_SECONDS = 90;
@@ -9,6 +9,7 @@ export const DRAG_ZOOM_OUT_FACTOR = 2;
 export const CONTAINER_CENTER_RATIO = 0.5;
 export const MIN_ZOOM_SELECTION_PX = 50;
 export const CLICK_MAX_DRAG_PX = 2;
+export const LEFT_MOUSE_BUTTON = 0;
 
 export const MAX_ZOOM_VISIBLE_SECONDS = 5;
 export const MAX_ZOOM_CANVAS_PX = 60000;
@@ -59,6 +60,11 @@ export const DEFAULT_SPECTROGRAM_WINDOWS: Record<SpectrogramType, SpectrogramWin
 export const DEFAULT_SPECTROGRAM_AUDIO_DURATION: Record<SpectrogramType, number> = {
     [SpectrogramType.TOP]: 0,
     [SpectrogramType.BOTTOM]: 0
+};
+
+export const DEFAULT_SPECTROGRAM_MEASURE_AREAS: Record<SpectrogramType, MeasureArea | null> = {
+    [SpectrogramType.TOP]: null,
+    [SpectrogramType.BOTTOM]: null
 };
 
 export const DEFAULT_SPECTROGRAM_AUDIO_GUID: Record<SpectrogramType, string | null> = {

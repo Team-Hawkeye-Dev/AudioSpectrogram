@@ -13,6 +13,28 @@ export interface AudioSpectrogramZoomControls {
     resetZoom: () => void;
 }
 
+export interface MeasureArea {
+    startTimeSeconds: number;
+    endTimeSeconds: number;
+    startFrequencyHz: number;
+    endFrequencyHz: number;
+}
+
+export interface MeasureBox {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+}
+
+export interface AudioSpectrogramMeasureControls {
+    measureArea: MeasureArea | null;
+    measureBox: MeasureBox | null;
+    onMeasureStart: (event: PointerEvent<HTMLDivElement>) => void;
+    onMeasureMove: (event: PointerEvent<HTMLDivElement>) => void;
+    onMeasureEnd: (event: PointerEvent<HTMLDivElement>) => void;
+}
+
 export interface PlaybackPosition {
     currentTime: number;
     progressLinePx: number;
@@ -36,6 +58,7 @@ export interface AudioSpectrogramViewerProps {
     stepHz: number;
     spectrogramContainerRef: RefObject<HTMLDivElement | null>;
     zoom: AudioSpectrogramZoomControls;
+    measure: AudioSpectrogramMeasureControls;
     playback: AudioSpectrogramPlaybackControls;
     detections: AudioSpectrogramDetectionControls;
     isReadyAudio: boolean;

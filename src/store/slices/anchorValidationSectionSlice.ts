@@ -2,9 +2,11 @@ import type { StateCreator } from 'zustand';
 import {
     DEFAULT_SPECTROGRAM_AUDIO_DURATION,
     DEFAULT_SPECTROGRAM_AUDIO_GUID,
+    DEFAULT_SPECTROGRAM_MEASURE_AREAS,
     DEFAULT_SPECTROGRAM_WINDOWS,
     type SpectrogramType,
 } from '../../components/anchorValidationModal/audioSpectrogram/consts/audioSpectrogram.consts';
+import type { MeasureArea } from '../../core/components/spectrogram/audioSpectrogramViewer/types';
 import { updateSlice } from '../storeSlices';
 import { StoreSlices, type MassiviAppState } from '../useStore';
 
@@ -28,6 +30,8 @@ export type AnchorValidationSlice = {
     ) => void;
     spectrogramAudioDuration: Record<SpectrogramType, number>;
     setSpectrogramAudioDuration: (spectrogramPlotType: SpectrogramType, audioDuration: number) => void;
+    spectrogramMeasureAreas: Record<SpectrogramType, MeasureArea | null>;
+    setSpectrogramMeasureArea: (spectrogramPlotType: SpectrogramType, measureArea: MeasureArea) => void;
 };
 
 export const expandSectionSlice: StateCreator<MassiviAppState, [], [], AnchorValidationSlice> = (set) => ({
@@ -68,6 +72,17 @@ export const expandSectionSlice: StateCreator<MassiviAppState, [], [], AnchorVal
                 spectrogramAudioDuration: {
                     ...expandSection.spectrogramAudioDuration,
                     [spectrogramPlotType]: audioDuration
+                }
+            }))
+        ),
+
+    spectrogramMeasureAreas: DEFAULT_SPECTROGRAM_MEASURE_AREAS,
+    setSpectrogramMeasureArea: (spectrogramPlotType, measureArea) =>
+        set(
+            updateSlice(StoreSlices.ANCHOR_VALIDATION_SECTION, (anchorValidationSection) => ({
+                spectrogramMeasureAreas: {
+                    ...anchorValidationSection.spectrogramMeasureAreas,
+                    [spectrogramPlotType]: measureArea
                 }
             }))
         )

@@ -1,7 +1,12 @@
-import type { RefObject } from "react";
-import type { AudioSpectrogramPlaybackControls, AudioSpectrogramZoomControls } from "../../types";
+import type { PointerEvent, RefObject } from "react";
+import type {
+  AudioSpectrogramMeasureControls,
+  AudioSpectrogramPlaybackControls,
+  AudioSpectrogramZoomControls,
+} from "../../types";
 import { timeFormat } from "../../utils/formatPlaybackTime";
 import { getZoomSelection } from "../../utils/selectionHighlight";
+import { MeasureSelection } from "../measureSelection/MeasureSelection";
 import {
   ProgressTimeTooltip,
   WavePlotContainer,
@@ -12,25 +17,46 @@ import {
 interface WavePlotViewProps {
   spectrogramContainerRef: RefObject<HTMLDivElement | null>;
   zoom: AudioSpectrogramZoomControls;
+  measure: AudioSpectrogramMeasureControls;
   playback: AudioSpectrogramPlaybackControls;
 }
 
 export const WavePlotView = ({
   spectrogramContainerRef,
   zoom,
+  measure,
   playback,
 }: WavePlotViewProps) => {
   const { selection, onDragStart, onDragMove, onDragEnd } = zoom;
+  const { measureArea, measureBox, onMeasureStart, onMeasureMove, onMeasureEnd } = measure;
   const zoomSelection = selection ? getZoomSelection(selection) : null;
   const { playbackPosition } = playback;
+
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.ctrlKey) {
+      onMeasureStart(event);
+      return;
+    }
+    onDragStart(event);
+  };
+
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    onDragMove(event);
+    onMeasureMove(event);
+  };
+
+  const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    onDragEnd(event);
+    onMeasureEnd(event);
+  };
 
   return (
     <WavePlotContainer>
       <WavePlotWrapper
         ref={spectrogramContainerRef}
-        onPointerDown={onDragStart}
-        onPointerMove={onDragMove}
-        onPointerUp={onDragEnd}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
       >
         {zoomSelection && (
           <ZoomSelectionHighlight
@@ -40,6 +66,7 @@ export const WavePlotView = ({
             }}
           />
         )}
+        {measureArea && measureBox && <MeasureSelection measureArea={measureArea} measureBox={measureBox} />}
         <ProgressTimeTooltip style={{ left: playbackPosition.progressLinePx }}>
           {timeFormat(playbackPosition.currentTime)}
         </ProgressTimeTooltip>
