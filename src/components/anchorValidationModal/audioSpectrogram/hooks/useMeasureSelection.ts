@@ -1,6 +1,7 @@
 import { useEffect, useState, type PointerEvent } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 import { TIME_AXIS_HEIGHT_PX } from '../consts/audioSpectrogram.consts';
+import { setWaveSurferScrollCallback, setWaveSurferZoomCallback } from '../utils/spectrogramActions';
 import type { SpectrogramInteractionContext } from '../types/audioSpectrogram.types';
 import type { AudioSpectrogramMeasureControls, MeasureArea, MeasureBox } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 import { useMassiviAppStore } from '../../../../store/useStore';
@@ -9,16 +10,9 @@ interface UseMeasureSelectionProps extends SpectrogramInteractionContext {
   maxFrequencyHz: number;
 }
 
-interface PlotPoint {
-  x: number;
-  y: number;
-}
-
-interface PlotScale {
-  pxPerSec: number;
-  scrollPx: number;
-  heightPx: number;
-  hzPerPx: number;
+interface MeasurePoint {
+  timeSeconds: number;
+  frequencyHz: number;
 }
 
 const LEFT_MOUSE_CLICK = 0;
@@ -27,33 +21,37 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 
 const getSpectrogramHeightPx = (plot: HTMLElement) => plot.clientHeight - TIME_AXIS_HEIGHT_PX;
 
-const getPlotPoint = (event: PointerEvent<HTMLDivElement>): PlotPoint => {
+const getMeasurePoint = (event: PointerEvent<HTMLDivElement>, waveSurfer: WaveSurfer, maxFrequencyHz: number): MeasurePoint => {
   const plot = event.currentTarget;
   const { left, top } = plot.getBoundingClientRect();
+  const heightPx = getSpectrogramHeightPx(plot);
+  const x = clamp(event.clientX - left, 0, plot.clientWidth);
+  const y = clamp(event.clientY - top, 0, heightPx);
+
   return {
-    x: clamp(event.clientX - left, 0, plot.clientWidth),
-    y: clamp(event.clientY - top, 0, getSpectrogramHeightPx(plot)),
+    timeSeconds: (waveSurfer.getScroll() + x) / waveSurfer.options.minPxPerSec,
+    frequencyHz: (1 - y / heightPx) * maxFrequencyHz,
   };
 };
 
-const getPlotScale = (waveSurfer: WaveSurfer, plot: HTMLElement, maxFrequencyHz: number): PlotScale => {
-  const heightPx = getSpectrogramHeightPx(plot);
-  return { pxPerSec: waveSurfer.options.minPxPerSec, scrollPx: waveSurfer.getScroll(), heightPx, hzPerPx: maxFrequencyHz / heightPx };
+const toMeasureArea = (start: MeasurePoint, end: MeasurePoint): MeasureArea => ({
+  startTimeSeconds: Math.min(start.timeSeconds, end.timeSeconds),
+  endTimeSeconds: Math.max(start.timeSeconds, end.timeSeconds),
+  startFrequencyHz: Math.min(start.frequencyHz, end.frequencyHz),
+  endFrequencyHz: Math.max(start.frequencyHz, end.frequencyHz),
+});
+
+const toMeasureBox = (area: MeasureArea, waveSurfer: WaveSurfer, plot: HTMLElement, maxFrequencyHz: number): MeasureBox => {
+  const pxPerSec = waveSurfer.options.minPxPerSec;
+  const pxPerHz = getSpectrogramHeightPx(plot) / maxFrequencyHz;
+
+  return {
+    left: area.startTimeSeconds * pxPerSec - waveSurfer.getScroll(),
+    top: (maxFrequencyHz - area.endFrequencyHz) * pxPerHz,
+    width: (area.endTimeSeconds - area.startTimeSeconds) * pxPerSec,
+    height: (area.endFrequencyHz - area.startFrequencyHz) * pxPerHz,
+  };
 };
-
-const pointsToMeasureArea = (start: PlotPoint, end: PlotPoint, { pxPerSec, scrollPx, heightPx, hzPerPx }: PlotScale): MeasureArea => ({
-  startTimeSeconds: (scrollPx + Math.min(start.x, end.x)) / pxPerSec,
-  endTimeSeconds: (scrollPx + Math.max(start.x, end.x)) / pxPerSec,
-  startFrequencyHz: (heightPx - Math.max(start.y, end.y)) * hzPerPx,
-  endFrequencyHz: (heightPx - Math.min(start.y, end.y)) * hzPerPx,
-});
-
-const measureAreaToBox = (area: MeasureArea, { pxPerSec, scrollPx, heightPx, hzPerPx }: PlotScale): MeasureBox => ({
-  left: area.startTimeSeconds * pxPerSec - scrollPx,
-  top: heightPx - area.endFrequencyHz / hzPerPx,
-  width: (area.endTimeSeconds - area.startTimeSeconds) * pxPerSec,
-  height: (area.endFrequencyHz - area.startFrequencyHz) / hzPerPx,
-});
 
 export const useMeasureSelection = ({
   spectrogramContainerRef,
@@ -62,23 +60,22 @@ export const useMeasureSelection = ({
   isReadyAudio,
   maxFrequencyHz,
 }: UseMeasureSelectionProps): AudioSpectrogramMeasureControls => {
-  const measureArea = useMassiviAppStore((state) => state.anchorValidationSection.spectrogramMeasureAreas[spectrogramPlotType]);
+  const savedMeasureArea = useMassiviAppStore((state) => state.anchorValidationSection.spectrogramMeasureAreas[spectrogramPlotType]);
   const setMeasureArea = useMassiviAppStore((state) => state.anchorValidationSection.setSpectrogramMeasureArea);
+  const [startPoint, setStartPoint] = useState<MeasurePoint | null>(null);
+  const [draftMeasureArea, setDraftMeasureArea] = useState<MeasureArea | null>(null);
   const [measureBox, setMeasureBox] = useState<MeasureBox | null>(null);
-  const [startPoint, setStartPoint] = useState<PlotPoint | null>(null);
+  const measureArea = draftMeasureArea ?? savedMeasureArea;
 
   useEffect(() => {
     const waveSurfer = waveSurferInstanceRef.current;
     const plot = spectrogramContainerRef.current;
-    if (!isReadyAudio || !waveSurfer || !plot || !measureArea) {
-      setMeasureBox(null);
-      return;
-    }
+    if (!isReadyAudio || !waveSurfer || !plot || !measureArea) return;
 
-    const updateMeasureBox = () => setMeasureBox(measureAreaToBox(measureArea, getPlotScale(waveSurfer, plot, maxFrequencyHz)));
+    const updateMeasureBox = () => setMeasureBox(toMeasureBox(measureArea, waveSurfer, plot, maxFrequencyHz));
     updateMeasureBox();
-    const unsubscribeScroll = waveSurfer.on('scroll', updateMeasureBox);
-    const unsubscribeZoom = waveSurfer.on('zoom', updateMeasureBox);
+    const unsubscribeScroll = setWaveSurferScrollCallback(waveSurfer, updateMeasureBox);
+    const unsubscribeZoom = setWaveSurferZoomCallback(waveSurfer, updateMeasureBox);
     return () => {
       unsubscribeScroll();
       unsubscribeZoom();
@@ -86,24 +83,26 @@ export const useMeasureSelection = ({
   }, [isReadyAudio, measureArea, maxFrequencyHz, spectrogramContainerRef, waveSurferInstanceRef]);
 
   const onMeasureStart = (event: PointerEvent<HTMLDivElement>) => {
-    if (!isReadyAudio || event.button !== LEFT_MOUSE_CLICK) return;
+    const waveSurfer = waveSurferInstanceRef.current;
+    if (!isReadyAudio || !waveSurfer || event.button !== LEFT_MOUSE_CLICK) return;
     event.currentTarget.setPointerCapture(event.pointerId);
-    setStartPoint(getPlotPoint(event));
+    setStartPoint(getMeasurePoint(event, waveSurfer, maxFrequencyHz));
   };
 
   const onMeasureMove = (event: PointerEvent<HTMLDivElement>) => {
     const waveSurfer = waveSurferInstanceRef.current;
     if (!waveSurfer || !startPoint) return;
 
-    const endPoint = getPlotPoint(event);
-    const isEmptyArea = endPoint.x === startPoint.x || endPoint.y === startPoint.y;
-    if (isEmptyArea) return;
-
-    const scale = getPlotScale(waveSurfer, event.currentTarget, maxFrequencyHz);
-    setMeasureArea(spectrogramPlotType, pointsToMeasureArea(startPoint, endPoint, scale));
+    const endPoint = getMeasurePoint(event, waveSurfer, maxFrequencyHz);
+    const isEmptyArea = endPoint.timeSeconds === startPoint.timeSeconds || endPoint.frequencyHz === startPoint.frequencyHz;
+    if (!isEmptyArea) setDraftMeasureArea(toMeasureArea(startPoint, endPoint));
   };
 
-  const onMeasureEnd = () => setStartPoint(null);
+  const onMeasureEnd = () => {
+    if (draftMeasureArea) setMeasureArea(spectrogramPlotType, draftMeasureArea);
+    setDraftMeasureArea(null);
+    setStartPoint(null);
+  };
 
   return { measureArea, measureBox, isMeasuring: startPoint !== null, onMeasureStart, onMeasureMove, onMeasureEnd };
 };
