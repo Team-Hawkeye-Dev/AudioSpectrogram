@@ -32,31 +32,25 @@ export const WavePlotView = ({
   const zoomSelection = selection ? getZoomSelection(selection) : null;
   const { playbackPosition } = playback;
 
-  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.ctrlKey) {
-      onMeasureStart(event);
-      return;
-    }
-    onDragStart(event);
-  };
-
-  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    onDragMove(event);
-    onMeasureMove(event);
-  };
-
-  const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
-    onDragEnd(event);
-    onMeasureEnd();
-  };
-
   return (
     <WavePlotContainer>
       <WavePlotWrapper
         ref={spectrogramContainerRef}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
+        onPointerDown={(event) => {
+           if (event.ctrlKey) {
+      onMeasureStart(event);
+      return;
+    }
+    onDragStart(event);
+        }}
+        onPointerMove={(event) => {
+          onDragMove(event);
+    onMeasureMove(event);
+        }}
+        onPointerUp={(event) => {
+          onDragEnd(event);
+    onMeasureEnd();
+        }}
       >
         {zoomSelection && (
           <ZoomSelectionHighlight

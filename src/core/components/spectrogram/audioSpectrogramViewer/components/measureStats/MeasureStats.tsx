@@ -12,23 +12,25 @@ interface MeasureStatsProps {
   measureArea: MeasureArea;
 }
 
-export const MeasureStats = ({ measureArea }: MeasureStatsProps) => {
-  const durationSeconds = measureArea.endTimeSeconds - measureArea.startTimeSeconds;
-  const bandwidthHz = measureArea.endFrequencyHz - measureArea.startFrequencyHz;
+export const MeasureStats = ({
+  measureArea: { startTimeSeconds, endTimeSeconds, startFrequencyHz, endFrequencyHz },
+}: MeasureStatsProps) => {
+  const durationSeconds = endTimeSeconds - startTimeSeconds;
+  const bandwidthHz = endFrequencyHz - startFrequencyHz;
 
   return (
     <MeasureStatsContainer>
       <MeasureStatsRow>
         <MeasureStatsHeading>Time</MeasureStatsHeading>
         <MeasureStatsValue>
-          {formatMeasureTime(measureArea.startTimeSeconds)} → {formatMeasureTime(measureArea.endTimeSeconds)}
+          {formatMeasureTime(startTimeSeconds)} → {formatMeasureTime(endTimeSeconds)}
         </MeasureStatsValue>
         <MeasureStatsDifference>Δ {formatMeasureDuration(durationSeconds)}</MeasureStatsDifference>
       </MeasureStatsRow>
       <MeasureStatsRow>
         <MeasureStatsHeading>Freq</MeasureStatsHeading>
         <MeasureStatsValue>
-          {formatMeasureFrequency(measureArea.startFrequencyHz)} → {formatMeasureFrequency(measureArea.endFrequencyHz)}
+          {formatMeasureFrequency(startFrequencyHz)} → {formatMeasureFrequency(endFrequencyHz)}
         </MeasureStatsValue>
         <MeasureStatsDifference>Δ {formatMeasureFrequency(bandwidthHz)}</MeasureStatsDifference>
       </MeasureStatsRow>
