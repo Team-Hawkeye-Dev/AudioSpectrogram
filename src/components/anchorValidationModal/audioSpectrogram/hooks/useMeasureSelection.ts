@@ -19,6 +19,13 @@ interface PlotPoint {
   y: number;
 }
 
+interface PlotScale {
+  pxPerSec: number;
+  scrollPx: number;
+  spectrogramHeightPx: number;
+  hzPerPx: number;
+}
+
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 const getSpectrogramHeightPx = (plot: HTMLElement) => plot.clientHeight - TIME_AXIS_HEIGHT_PX;
@@ -35,17 +42,19 @@ const getPlotPoint = (event: PointerEvent<HTMLDivElement>): PlotPoint => {
   };
 };
 
-const pointsToMeasureArea = (
-  startPoint: PlotPoint,
-  endPoint: PlotPoint,
-  waveSurfer: WaveSurfer,
-  spectrogramHeightPx: number,
-  maxFrequencyHz: number,
-): MeasureArea => {
-  const pxPerSec = waveSurfer.options.minPxPerSec;
-  const scrollPx = waveSurfer.getScroll();
-  const hzPerPx = maxFrequencyHz / spectrogramHeightPx;
+const getPlotScale = (waveSurfer: WaveSurfer, plot: HTMLElement, maxFrequencyHz: number): PlotScale => {
+  const spectrogramHeightPx = getSpectrogramHeightPx(plot);
 
+  return {
+    pxPerSec: waveSurfer.options.minPxPerSec,
+    scrollPx: waveSurfer.getScroll(),
+    spectrogramHeightPx,
+    hzPerPx: maxFrequencyHz / spectrogramHeightPx,
+  };
+};
+
+const pointsToMeasureArea = (startPoint: PlotPoint, endPoint: PlotPoint, scale: PlotScale): MeasureArea => {
+  const { pxPerSec, scrollPx, spectrogramHeightPx, hzPerPx } = scale;
   const left = Math.min(startPoint.x, endPoint.x);
   const right = Math.max(startPoint.x, endPoint.x);
   const top = Math.min(startPoint.y, endPoint.y);
@@ -59,20 +68,12 @@ const pointsToMeasureArea = (
   };
 };
 
-const measureAreaToBox = (
-  measureArea: MeasureArea,
-  waveSurfer: WaveSurfer,
-  spectrogramHeightPx: number,
-  maxFrequencyHz: number,
-): MeasureBox => {
-  const pxPerSec = waveSurfer.options.minPxPerSec;
-  const scrollPx = waveSurfer.getScroll();
-  const pxPerHz = spectrogramHeightPx / maxFrequencyHz;
-
+const measureAreaToBox = (measureArea: MeasureArea, scale: PlotScale): MeasureBox => {
+  const { pxPerSec, scrollPx, spectrogramHeightPx, hzPerPx } = scale;
   const left = measureArea.startTimeSeconds * pxPerSec - scrollPx;
   const right = measureArea.endTimeSeconds * pxPerSec - scrollPx;
-  const top = spectrogramHeightPx - measureArea.endFrequencyHz * pxPerHz;
-  const bottom = spectrogramHeightPx - measureArea.startFrequencyHz * pxPerHz;
+  const top = spectrogramHeightPx - measureArea.endFrequencyHz / hzPerPx;
+  const bottom = spectrogramHeightPx - measureArea.startFrequencyHz / hzPerPx;
 
   return { left, top, width: right - left, height: bottom - top };
 };
@@ -99,7 +100,7 @@ export const useMeasureSelection = ({
     }
 
     const updateMeasureBox = () =>
-      setMeasureBox(measureAreaToBox(measureArea, waveSurfer, getSpectrogramHeightPx(plot), maxFrequencyHz));
+      setMeasureBox(measureAreaToBox(measureArea, getPlotScale(waveSurfer, plot, maxFrequencyHz)));
 
     updateMeasureBox();
     return onSpectrogramViewChange(waveSurfer, updateMeasureBox);
@@ -121,8 +122,8 @@ export const useMeasureSelection = ({
     const isEmptyArea = endPoint.x === startPoint.x || endPoint.y === startPoint.y;
     if (isEmptyArea) return;
 
-    const spectrogramHeightPx = getSpectrogramHeightPx(event.currentTarget);
-    setMeasureArea(spectrogramPlotType, pointsToMeasureArea(startPoint, endPoint, waveSurfer, spectrogramHeightPx, maxFrequencyHz));
+    const scale = getPlotScale(waveSurfer, event.currentTarget, maxFrequencyHz);
+    setMeasureArea(spectrogramPlotType, pointsToMeasureArea(startPoint, endPoint, scale));
     setIsMeasuring(true);
   };
 

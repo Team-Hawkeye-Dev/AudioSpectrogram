@@ -15,14 +15,8 @@ export const AudioSpectrogramSourcePlot = ({
     const { audioUrl, pickingLabelData } = useAudioSpectrogramUrl(audioGuid, spectrogramType)
     const viewer = useAudioSpectrogramViewer(audioUrl, maxHz, spectrogramType, pickingLabelData)
     const zoom = useZoomSelection(viewer)
-    const { spectrogramContainerRef, waveSurferInstanceRef, isPlaying, detections, isReadyAudio, togglePlay, playbackPosition} = viewer 
-    const measure = useMeasureSelection({
-        spectrogramContainerRef,
-        waveSurferInstanceRef,
-        spectrogramPlotType: spectrogramType,
-        isReadyAudio,
-        maxFrequencyHz: maxHz,
-    })
+    const measure = useMeasureSelection({ ...viewer, maxFrequencyHz: maxHz })
+    const { spectrogramContainerRef, isPlaying, detections, isReadyAudio, togglePlay, playbackPosition} = viewer 
 
     return (
         <>

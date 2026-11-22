@@ -57,14 +57,12 @@ export const MeasureStatsValue = styled(Typography)(({theme}) => ({
     fontVariantNumeric: 'tabular-nums'
 }))
 
-export const MeasureStatsDifference = styled(Typography)(({theme}) => ({
+export const MeasureStatsDifference = styled(MeasureStatsValue)(({theme}) => ({
     textAlign: 'center',
     padding: theme.spacing(0.25, 0.75),
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.success.main, 0.16),
     color: theme.palette.success.main,
     fontSize: theme.typography.caption.fontSize,
-    fontWeight: theme.typography.fontWeightMedium,
-    fontVariantNumeric: 'tabular-nums',
     whiteSpace: 'nowrap'
 }))
