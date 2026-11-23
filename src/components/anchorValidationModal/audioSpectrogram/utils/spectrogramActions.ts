@@ -3,7 +3,7 @@ import type WaveSurfer from 'wavesurfer.js';
 import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogram-windowed.js';
 import type TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.js';
 import type { Region } from 'wavesurfer.js/dist/plugins/regions.js';
-import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
+import type { FrequencyView, PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 
 export const onSpectrogramReady = (
   waveSurferInstanceRef: MutableRefObject<WaveSurfer | null>,
@@ -97,4 +97,20 @@ export const scrollRegionIntoView = (waveSurfer: WaveSurfer, region: Region, con
   const visibleEndTime = visibleStartTime + containerWidthPx / minPxPerSec
   const isRegionVisible = region.start >= visibleStartTime && region.end <= visibleEndTime
   if (!isRegionVisible) waveSurfer.setScrollTime(region.start)
+}
+
+export const applySpectrogramFrequencyView = (
+  spectrogramPlugin: WindowedSpectrogramPlugin,
+  frequencyView: FrequencyView,
+  maxFrequencyHz: number,
+) => {
+  const visibleSpanHz = frequencyView.maxHz - frequencyView.minHz
+  const zoomFactor = maxFrequencyHz / visibleSpanHz
+  const hiddenAboveHz = maxFrequencyHz - frequencyView.maxHz
+  const hiddenAbovePercent = (hiddenAboveHz / visibleSpanHz) * 100
+  const canvasContainer = spectrogramPlugin['canvasContainer']
+
+  spectrogramPlugin['wrapper'].style.overflow = 'hidden'
+  canvasContainer.style.transformOrigin = 'top'
+  canvasContainer.style.transform = `translateY(-${hiddenAbovePercent}%) scaleY(${zoomFactor})`
 }

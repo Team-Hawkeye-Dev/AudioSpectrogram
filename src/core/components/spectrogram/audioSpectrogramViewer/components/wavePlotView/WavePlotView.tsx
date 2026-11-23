@@ -32,14 +32,7 @@ export const WavePlotView = ({
         onPointerMove={onDragMove}
         onPointerUp={onDragEnd}
       >
-        {zoomSelection && (
-          <ZoomSelectionHighlight
-            style={{
-              left: zoomSelection.startSelection,
-              width: zoomSelection.selectionWidth,
-            }}
-          />
-        )}
+        {zoomSelection && <ZoomSelectionHighlight style={zoomSelection} />}
         <ProgressTimeTooltip style={{ left: playbackPosition.progressLinePx }}>
           {timeFormat(playbackPosition.currentTime)}
         </ProgressTimeTooltip>

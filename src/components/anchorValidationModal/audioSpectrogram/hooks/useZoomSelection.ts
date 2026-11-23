@@ -2,14 +2,17 @@ import { useCallback, useMemo } from 'react';
 import type { ZoomSelectionProps } from '../types/audioSpectrogram.types';
 import { useDragSelection } from './useDragSelection';
 import { useWheelScroll } from './useWheelScroll';
+import { useFrequencyZoom } from './useFrequencyZoom';
 import { useMassiviAppStore } from '../../../../store/useStore';
 
 export const useZoomSelection = ({
   spectrogramContainerRef,
   waveSurferInstanceRef,
+  spectrogramPluginRef,
   initialViewRef,
   spectrogramPlotType,
   isReadyAudio,
+  maxFrequencyHz,
   applyZoomView,
 }: ZoomSelectionProps) => {
   const spectrogramContainer = spectrogramContainerRef.current;
@@ -22,6 +25,13 @@ export const useZoomSelection = ({
     waveSurferInstanceRef,
     spectrogramPlotType,
     isReadyAudio,
+  });
+
+  const { frequencyView, zoomInFrequency, zoomOutFrequency, resetFrequencyView } = useFrequencyZoom({
+    spectrogramContainerRef,
+    spectrogramPluginRef,
+    isReadyAudio,
+    maxFrequencyHz,
   });
 
   const minZoom = useMemo(() => {
@@ -42,14 +52,18 @@ export const useZoomSelection = ({
     onZoomOut: (minPxPerSec, scrollTime) => {
       applyZoomView({ minPxPerSec, scrollTime });
     },
+    onFrequencyZoomIn: zoomInFrequency,
+    onFrequencyZoomOut: zoomOutFrequency,
   });
 
   const resetZoom = useCallback(() => {
     applyZoomView({minPxPerSec: minZoom, scrollTime: 0})
-  }, [minZoom, applyZoomView]);
+    resetFrequencyView()
+  }, [minZoom, applyZoomView, resetFrequencyView]);
 
   return {
     selection,
+    frequencyView,
     onDragStart,
     onDragMove,
     onDragEnd,

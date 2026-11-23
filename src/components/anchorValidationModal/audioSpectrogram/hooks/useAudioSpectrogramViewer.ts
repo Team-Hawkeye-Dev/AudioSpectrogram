@@ -133,6 +133,8 @@ export const useAudioSpectrogramViewer = (audioUrl: string | undefined, maxFrequ
   return {
     spectrogramContainerRef,
     waveSurferInstanceRef,
+    spectrogramPluginRef,
+    maxFrequencyHz,
     initialViewRef,
     spectrogramPlotType,
     isReadyAudio,

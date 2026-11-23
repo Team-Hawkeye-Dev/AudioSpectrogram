@@ -1,24 +1,29 @@
-import { FREQUENCY_STEP } from "../../consts";
+import { FREQUENCY_LABEL_DECIMALS, FREQUENCY_STEP } from "../../consts";
+import type { FrequencyView } from "../../types";
 import { FrequencyLabel, FrequencyLabelList } from "./FrequencyLabels.styles";
 
 interface FrequencyLabelsProps {
     maxHz: number;
     stepHz: number;
+    frequencyView: FrequencyView;
 }
 
-export const FrequencyLabels = ({ maxHz, stepHz }: FrequencyLabelsProps) => {
+export const FrequencyLabels = ({ maxHz, stepHz, frequencyView }: FrequencyLabelsProps) => {
+    const labelCount = maxHz / stepHz + 1;
+    const visibleSpanHz = frequencyView.maxHz - frequencyView.minHz;
+    const labelStepHz = visibleSpanHz / (labelCount - 1);
     const frequencyLabelsHz = Array.from(
-        { length: maxHz / stepHz + 1 },
-        (_, index) => maxHz - index * stepHz,
+        { length: labelCount },
+        (_, index) => frequencyView.maxHz - index * labelStepHz,
     );
 
     return (
         <FrequencyLabelList>
-            {frequencyLabelsHz.map((frequencyHz) => {
-                const hz = frequencyHz / FREQUENCY_STEP;
+            {frequencyLabelsHz.map((frequencyHz, index) => {
+                const kHz = Number((frequencyHz / FREQUENCY_STEP).toFixed(FREQUENCY_LABEL_DECIMALS));
                 return (
-                    <FrequencyLabel key={frequencyHz}>
-                        {`${hz}k`}
+                    <FrequencyLabel key={index}>
+                        {`${kHz}k`}
                     </FrequencyLabel>
                 );
             })}

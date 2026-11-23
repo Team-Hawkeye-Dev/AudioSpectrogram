@@ -3,10 +3,18 @@ import type { PointerEvent, RefObject } from "react";
 export interface DragSelection {
     startPx: number;
     currentPx: number;
+    startYPx: number;
+    currentYPx: number;
+}
+
+export interface FrequencyView {
+    minHz: number;
+    maxHz: number;
 }
 
 export interface AudioSpectrogramZoomControls {
     selection: DragSelection | null;
+    frequencyView: FrequencyView;
     onDragStart: (event: PointerEvent<HTMLDivElement>) => void;
     onDragMove: (event: PointerEvent<HTMLDivElement>) => void;
     onDragEnd: (event: PointerEvent<HTMLDivElement>) => void;

@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
 import type WaveSurfer from 'wavesurfer.js';
 import type RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
+import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogram-windowed.js';
 import type { SpectrogramType } from '../consts/audioSpectrogram.consts';
 import type { AudioSpectrogramDetectionControls, PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 
@@ -29,6 +30,8 @@ export interface SpectrogramInteractionContext {
 }
 
 export interface ZoomSelectionProps extends SpectrogramInteractionContext {
+  spectrogramPluginRef: RefObject<WindowedSpectrogramPlugin | null>;
+  maxFrequencyHz: number;
   initialViewRef: RefObject<InitialView | null>;
   applyZoomView: (view: InitialView) => void;
 }
