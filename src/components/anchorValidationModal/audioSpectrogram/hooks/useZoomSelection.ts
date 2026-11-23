@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { ZoomSelectionProps } from '../types/audioSpectrogram.types';
 import { useDragSelection } from './useDragSelection';
 import { useWheelScroll } from './useWheelScroll';
-import { FREQUENCY_MIN_HZ, MAX_ZOOM_VISIBLE_HZ } from '../consts/audioSpectrogram.consts';
-import { applySpectrogramFrequencyView, zoomInFrequencyView, zoomOutFrequencyView } from '../utils/spectrogramActions';
+import { CONTAINER_CENTER_RATIO, FREQUENCY_MIN_HZ, FULL_PERCENT, MAX_ZOOM_VISIBLE_HZ } from '../consts/audioSpectrogram.consts';
 import type { FrequencyView } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 import { useMassiviAppStore } from '../../../../store/useStore';
 
@@ -31,12 +30,37 @@ export const useZoomSelection = ({
 
   const fullFrequencyView = useMemo(() => ({ minHz: FREQUENCY_MIN_HZ, maxHz: maxFrequencyHz }), [maxFrequencyHz]);
   const [frequencyView, setFrequencyView] = useState<FrequencyView>(fullFrequencyView);
-  const isMaxFrequencyZoom = frequencyView.maxHz - frequencyView.minHz <= MAX_ZOOM_VISIBLE_HZ;
+  const visibleSpanHz = frequencyView.maxHz - frequencyView.minHz;
+  const isMaxYAxisZoom = visibleSpanHz <= MAX_ZOOM_VISIBLE_HZ;
 
-  useEffect(() => {
+  if (!isReadyAudio && frequencyView !== fullFrequencyView) setFrequencyView(fullFrequencyView);
+
+  const applyYAxisView = useCallback((nextView: FrequencyView) => {
     const spectrogramPlugin = spectrogramPluginRef.current;
-    if (isReadyAudio && spectrogramPlugin) applySpectrogramFrequencyView(spectrogramPlugin, frequencyView, maxFrequencyHz);
-  }, [isReadyAudio, frequencyView, maxFrequencyHz, spectrogramPluginRef]);
+    if (!spectrogramPlugin) return;
+    const yAxisZoomFactor = maxFrequencyHz / (nextView.maxHz - nextView.minHz);
+    const hiddenAbovePercent = (maxFrequencyHz - nextView.maxHz) / maxFrequencyHz * FULL_PERCENT;
+
+    spectrogramPlugin['wrapper'].style.overflow = 'hidden';
+    spectrogramPlugin['canvasContainer'].style.transformOrigin = 'top';
+    spectrogramPlugin['canvasContainer'].style.transform = `scaleY(${yAxisZoomFactor}) translateY(-${hiddenAbovePercent}%)`;
+    setFrequencyView(nextView);
+  }, [spectrogramPluginRef, maxFrequencyHz]);
+
+  const zoomInYAxis = (selectionTopRatio: number, selectionBottomRatio: number) => {
+    const selectionMaxHz = frequencyView.maxHz - selectionTopRatio * visibleSpanHz;
+    const selectionSpanHz = (selectionBottomRatio - selectionTopRatio) * visibleSpanHz;
+    const nextVisibleSpanHz = Math.max(selectionSpanHz, MAX_ZOOM_VISIBLE_HZ);
+    const nextMinHz = Math.max(FREQUENCY_MIN_HZ, selectionMaxHz - nextVisibleSpanHz);
+    applyYAxisView({ minHz: nextMinHz, maxHz: nextMinHz + nextVisibleSpanHz });
+  };
+
+  const zoomOutYAxis = () => {
+    const halfVisibleSpanHz = visibleSpanHz * CONTAINER_CENTER_RATIO;
+    const nextMinHz = Math.max(FREQUENCY_MIN_HZ, frequencyView.minHz - halfVisibleSpanHz);
+    const nextMaxHz = Math.min(maxFrequencyHz, frequencyView.maxHz + halfVisibleSpanHz);
+    applyYAxisView({ minHz: nextMinHz, maxHz: nextMaxHz });
+  };
 
   const minZoom = useMemo(() => {
     if (!initialView || !spectrogramContainer) return initialView?.minPxPerSec ?? 0;
@@ -56,19 +80,15 @@ export const useZoomSelection = ({
     onZoomOut: (minPxPerSec, scrollTime) => {
       applyZoomView({ minPxPerSec, scrollTime });
     },
-    onFrequencyZoomIn: (selectionTopRatio, selectionBottomRatio) => {
-      setFrequencyView((view) => zoomInFrequencyView(view, selectionTopRatio, selectionBottomRatio));
-    },
-    onFrequencyZoomOut: () => {
-      setFrequencyView((view) => zoomOutFrequencyView(view, maxFrequencyHz));
-    },
-    isMaxFrequencyZoom,
+    onYAxisZoomIn: zoomInYAxis,
+    onYAxisZoomOut: zoomOutYAxis,
+    isMaxYAxisZoom,
   });
 
   const resetZoom = useCallback(() => {
     applyZoomView({minPxPerSec: minZoom, scrollTime: 0})
-    setFrequencyView(fullFrequencyView)
-  }, [minZoom, applyZoomView, fullFrequencyView]);
+    applyYAxisView(fullFrequencyView)
+  }, [minZoom, applyZoomView, applyYAxisView, fullFrequencyView]);
 
   return {
     selection,

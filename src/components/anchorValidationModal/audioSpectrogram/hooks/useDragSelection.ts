@@ -11,15 +11,15 @@ interface UseDragSelectionProps extends SpectrogramInteractionContext {
     minZoomPxPerSec: number;
     onZoomIn: (minPxPerSec: number, scrollTime: number) => void
     onZoomOut: (minPxPerSec: number, scrollTime: number) => void
-    onFrequencyZoomIn: (selectionTopRatio: number, selectionBottomRatio: number) => void
-    onFrequencyZoomOut: () => void
-    isMaxFrequencyZoom: boolean
+    onYAxisZoomIn: (selectionTopRatio: number, selectionBottomRatio: number) => void
+    onYAxisZoomOut: () => void
+    isMaxYAxisZoom: boolean
 }
 
 const LEFT_MOUSE_CLICK = 0
 
 export const useDragSelection = ({
-spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudio, minZoomPxPerSec, onZoomIn, onZoomOut, onFrequencyZoomIn, onFrequencyZoomOut, isMaxFrequencyZoom
+spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudio, minZoomPxPerSec, onZoomIn, onZoomOut, onYAxisZoomIn, onYAxisZoomOut, isMaxYAxisZoom
 }: UseDragSelectionProps) => {
     const audioDuration = useMassiviAppStore((state) => state.anchorValidationSection.spectrogramAudioDuration[spectrogramPlotType])
     const setSpectrogramWindow = useMassiviAppStore((state) => state.anchorValidationSection.setSpectrogramWindow)
@@ -113,6 +113,22 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
         onZoomIn(nextMinPxPerSec, startTime)
     }
 
+    const zoomYAxisFromVerticalDrag = (spectrogramContainer: HTMLDivElement, startYPx: number, endYPx: number) => {
+        const isUpwardDrag = endYPx < startYPx
+        if (isUpwardDrag) {
+            onYAxisZoomOut()
+            return
+        }
+        if (isMaxYAxisZoom) {
+            showMaxZoomReached()
+            return
+        }
+        const spectrogramHeightPx = getSpectrogramHeightPx(spectrogramContainer)
+        const selectionTopRatio = startYPx / spectrogramHeightPx
+        const selectionBottomRatio = endYPx / spectrogramHeightPx
+        onYAxisZoomIn(selectionTopRatio, selectionBottomRatio)
+    }
+
     const onDragEnd = (event: PointerEvent<HTMLDivElement>) => {
         const spectrogramContainer = spectrogramContainerRef.current
         if (!spectrogramContainer) return 
@@ -137,17 +153,9 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
         waveSurfer.setTime(seekTime)
         return
        }
-       if (isFrequencySelection({ ...selection, currentPx: endPx, currentYPx: endYPx })) {
-        if (dragYPx < 0) {
-            onFrequencyZoomOut()
-            return
-        }
-        if (isMaxFrequencyZoom) {
-            showMaxZoomReached()
-            return
-        }
-        const spectrogramHeightPx = getSpectrogramHeightPx(spectrogramContainer)
-        onFrequencyZoomIn(selection.startYPx / spectrogramHeightPx, endYPx / spectrogramHeightPx)
+       const finalSelection = { ...selection, currentPx: endPx, currentYPx: endYPx }
+       if (isFrequencySelection(finalSelection)) {
+        zoomYAxisFromVerticalDrag(spectrogramContainer, selection.startYPx, endYPx)
         return
        }
        if (dragPx < 0) {

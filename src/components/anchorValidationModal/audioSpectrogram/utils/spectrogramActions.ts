@@ -3,8 +3,7 @@ import type WaveSurfer from 'wavesurfer.js';
 import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogram-windowed.js';
 import type TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.js';
 import type { Region } from 'wavesurfer.js/dist/plugins/regions.js';
-import type { FrequencyView, PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
-import { CONTAINER_CENTER_RATIO, FREQUENCY_MIN_HZ, MAX_ZOOM_VISIBLE_HZ } from '../consts/audioSpectrogram.consts';
+import type { PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 
 export const onSpectrogramReady = (
   waveSurferInstanceRef: MutableRefObject<WaveSurfer | null>,
@@ -98,37 +97,4 @@ export const scrollRegionIntoView = (waveSurfer: WaveSurfer, region: Region, con
   const visibleEndTime = visibleStartTime + containerWidthPx / minPxPerSec
   const isRegionVisible = region.start >= visibleStartTime && region.end <= visibleEndTime
   if (!isRegionVisible) waveSurfer.setScrollTime(region.start)
-}
-
-export const zoomInFrequencyView = (frequencyView: FrequencyView, selectionTopRatio: number, selectionBottomRatio: number): FrequencyView => {
-  const visibleSpanHz = frequencyView.maxHz - frequencyView.minHz
-  const selectionMaxHz = frequencyView.maxHz - selectionTopRatio * visibleSpanHz
-  const selectionSpanHz = (selectionBottomRatio - selectionTopRatio) * visibleSpanHz
-  const nextVisibleSpanHz = Math.max(selectionSpanHz, MAX_ZOOM_VISIBLE_HZ)
-  const nextMinHz = Math.max(FREQUENCY_MIN_HZ, selectionMaxHz - nextVisibleSpanHz)
-  return { minHz: nextMinHz, maxHz: nextMinHz + nextVisibleSpanHz }
-}
-
-export const zoomOutFrequencyView = (frequencyView: FrequencyView, maxFrequencyHz: number): FrequencyView => {
-  const halfVisibleSpanHz = (frequencyView.maxHz - frequencyView.minHz) * CONTAINER_CENTER_RATIO
-  return {
-    minHz: Math.max(FREQUENCY_MIN_HZ, frequencyView.minHz - halfVisibleSpanHz),
-    maxHz: Math.min(maxFrequencyHz, frequencyView.maxHz + halfVisibleSpanHz),
-  }
-}
-
-export const applySpectrogramFrequencyView = (
-  spectrogramPlugin: WindowedSpectrogramPlugin,
-  frequencyView: FrequencyView,
-  maxFrequencyHz: number,
-) => {
-  const visibleSpanHz = frequencyView.maxHz - frequencyView.minHz
-  const zoomFactor = maxFrequencyHz / visibleSpanHz
-  const zoomedPxPerHz = spectrogramPlugin['height'] / visibleSpanHz
-  const hiddenAbovePx = (maxFrequencyHz - frequencyView.maxHz) * zoomedPxPerHz
-  const canvasContainer = spectrogramPlugin['canvasContainer']
-
-  spectrogramPlugin['wrapper'].style.overflow = 'hidden'
-  canvasContainer.style.transformOrigin = 'top'
-  canvasContainer.style.transform = `translateY(-${hiddenAbovePx}px) scaleY(${zoomFactor})`
 }
