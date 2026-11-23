@@ -13,16 +13,18 @@ interface UseDragSelectionProps extends SpectrogramInteractionContext {
     onZoomOut: (minPxPerSec: number, scrollTime: number) => void
     onFrequencyZoomIn: (selectionTopRatio: number, selectionBottomRatio: number) => void
     onFrequencyZoomOut: () => void
+    isMaxFrequencyZoom: boolean
 }
 
 const LEFT_MOUSE_CLICK = 0
 
 export const useDragSelection = ({
-spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudio, minZoomPxPerSec, onZoomIn, onZoomOut, onFrequencyZoomIn, onFrequencyZoomOut
+spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudio, minZoomPxPerSec, onZoomIn, onZoomOut, onFrequencyZoomIn, onFrequencyZoomOut, isMaxFrequencyZoom
 }: UseDragSelectionProps) => {
     const audioDuration = useMassiviAppStore((state) => state.anchorValidationSection.spectrogramAudioDuration[spectrogramPlotType])
     const setSpectrogramWindow = useMassiviAppStore((state) => state.anchorValidationSection.setSpectrogramWindow)
     const { enqueueSnackbar } = useSnackbar();
+    const showMaxZoomReached = () => enqueueSnackbar('Maximum zoom level reached', { variant: 'info', preventDuplicate: true })
 
     const [selection, setSelection] = useState<DragSelection | null>(null)
     const startPxRef = useRef<number | null>(null)
@@ -98,10 +100,7 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
         const nextMinPxPerSec = resolveZoomInMinPxPerSec(width, selectedDuration, audioDuration)
 
         if (nextMinPxPerSec <= waveSurfer.options.minPxPerSec) {
-            enqueueSnackbar('Maximum zoom level reached', {
-                variant: 'info',
-                preventDuplicate: true
-            })
+            showMaxZoomReached()
             return
         }
 
@@ -143,10 +142,8 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
             onFrequencyZoomOut()
             return
         }
-        if (dragYPx < MIN_ZOOM_SELECTION_PX) {
-            enqueueSnackbar('Selected area is too small to zoom. Please select a taller area.', {
-                variant: 'warning'
-            })
+        if (isMaxFrequencyZoom) {
+            showMaxZoomReached()
             return
         }
         const spectrogramHeightPx = getSpectrogramHeightPx(spectrogramContainer)

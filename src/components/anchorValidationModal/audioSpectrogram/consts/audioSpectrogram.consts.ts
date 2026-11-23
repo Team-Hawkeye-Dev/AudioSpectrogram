@@ -12,6 +12,7 @@ export const CLICK_MAX_DRAG_PX = 2;
 export const SYNC_TOLERANCE_PX = 1;
 
 export const MAX_ZOOM_VISIBLE_SECONDS = 5;
+export const MAX_ZOOM_VISIBLE_HZ = 250;
 export const MAX_ZOOM_CANVAS_PX = 60000;
 
 export const TIME_AXIS_INTERVAL_SECONDS = 5;

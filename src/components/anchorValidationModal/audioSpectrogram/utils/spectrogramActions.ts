@@ -4,7 +4,7 @@ import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogr
 import type TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.js';
 import type { Region } from 'wavesurfer.js/dist/plugins/regions.js';
 import type { FrequencyView, PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
-import { CONTAINER_CENTER_RATIO, FREQUENCY_MIN_HZ } from '../consts/audioSpectrogram.consts';
+import { CONTAINER_CENTER_RATIO, FREQUENCY_MIN_HZ, MAX_ZOOM_VISIBLE_HZ } from '../consts/audioSpectrogram.consts';
 
 export const onSpectrogramReady = (
   waveSurferInstanceRef: MutableRefObject<WaveSurfer | null>,
@@ -102,10 +102,11 @@ export const scrollRegionIntoView = (waveSurfer: WaveSurfer, region: Region, con
 
 export const zoomInFrequencyView = (frequencyView: FrequencyView, selectionTopRatio: number, selectionBottomRatio: number): FrequencyView => {
   const visibleSpanHz = frequencyView.maxHz - frequencyView.minHz
-  return {
-    minHz: frequencyView.maxHz - selectionBottomRatio * visibleSpanHz,
-    maxHz: frequencyView.maxHz - selectionTopRatio * visibleSpanHz,
-  }
+  const selectionMaxHz = frequencyView.maxHz - selectionTopRatio * visibleSpanHz
+  const selectionSpanHz = (selectionBottomRatio - selectionTopRatio) * visibleSpanHz
+  const nextVisibleSpanHz = Math.max(selectionSpanHz, MAX_ZOOM_VISIBLE_HZ)
+  const nextMinHz = Math.max(FREQUENCY_MIN_HZ, selectionMaxHz - nextVisibleSpanHz)
+  return { minHz: nextMinHz, maxHz: nextMinHz + nextVisibleSpanHz }
 }
 
 export const zoomOutFrequencyView = (frequencyView: FrequencyView, maxFrequencyHz: number): FrequencyView => {

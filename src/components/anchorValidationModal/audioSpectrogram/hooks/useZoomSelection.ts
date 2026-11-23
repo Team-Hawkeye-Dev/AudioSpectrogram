@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ZoomSelectionProps } from '../types/audioSpectrogram.types';
 import { useDragSelection } from './useDragSelection';
 import { useWheelScroll } from './useWheelScroll';
-import { FREQUENCY_MIN_HZ } from '../consts/audioSpectrogram.consts';
+import { FREQUENCY_MIN_HZ, MAX_ZOOM_VISIBLE_HZ } from '../consts/audioSpectrogram.consts';
 import { applySpectrogramFrequencyView, zoomInFrequencyView, zoomOutFrequencyView } from '../utils/spectrogramActions';
 import type { FrequencyView } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 import { useMassiviAppStore } from '../../../../store/useStore';
@@ -31,6 +31,7 @@ export const useZoomSelection = ({
 
   const fullFrequencyView = useMemo(() => ({ minHz: FREQUENCY_MIN_HZ, maxHz: maxFrequencyHz }), [maxFrequencyHz]);
   const [frequencyView, setFrequencyView] = useState<FrequencyView>(fullFrequencyView);
+  const isMaxFrequencyZoom = frequencyView.maxHz - frequencyView.minHz <= MAX_ZOOM_VISIBLE_HZ;
 
   useEffect(() => {
     const spectrogramPlugin = spectrogramPluginRef.current;
@@ -61,6 +62,7 @@ export const useZoomSelection = ({
     onFrequencyZoomOut: () => {
       setFrequencyView((view) => zoomOutFrequencyView(view, maxFrequencyHz));
     },
+    isMaxFrequencyZoom,
   });
 
   const resetZoom = useCallback(() => {
