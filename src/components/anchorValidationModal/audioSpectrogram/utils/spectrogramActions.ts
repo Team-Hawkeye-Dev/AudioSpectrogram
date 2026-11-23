@@ -4,6 +4,7 @@ import type WindowedSpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogr
 import type TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.js';
 import type { Region } from 'wavesurfer.js/dist/plugins/regions.js';
 import type { FrequencyView, PlaybackPosition } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
+import { CONTAINER_CENTER_RATIO, FREQUENCY_MIN_HZ } from '../consts/audioSpectrogram.consts';
 
 export const onSpectrogramReady = (
   waveSurferInstanceRef: MutableRefObject<WaveSurfer | null>,
@@ -99,6 +100,22 @@ export const scrollRegionIntoView = (waveSurfer: WaveSurfer, region: Region, con
   if (!isRegionVisible) waveSurfer.setScrollTime(region.start)
 }
 
+export const zoomInFrequencyView = (frequencyView: FrequencyView, selectionTopRatio: number, selectionBottomRatio: number): FrequencyView => {
+  const visibleSpanHz = frequencyView.maxHz - frequencyView.minHz
+  return {
+    minHz: frequencyView.maxHz - selectionBottomRatio * visibleSpanHz,
+    maxHz: frequencyView.maxHz - selectionTopRatio * visibleSpanHz,
+  }
+}
+
+export const zoomOutFrequencyView = (frequencyView: FrequencyView, maxFrequencyHz: number): FrequencyView => {
+  const halfVisibleSpanHz = (frequencyView.maxHz - frequencyView.minHz) * CONTAINER_CENTER_RATIO
+  return {
+    minHz: Math.max(FREQUENCY_MIN_HZ, frequencyView.minHz - halfVisibleSpanHz),
+    maxHz: Math.min(maxFrequencyHz, frequencyView.maxHz + halfVisibleSpanHz),
+  }
+}
+
 export const applySpectrogramFrequencyView = (
   spectrogramPlugin: WindowedSpectrogramPlugin,
   frequencyView: FrequencyView,
@@ -106,11 +123,11 @@ export const applySpectrogramFrequencyView = (
 ) => {
   const visibleSpanHz = frequencyView.maxHz - frequencyView.minHz
   const zoomFactor = maxFrequencyHz / visibleSpanHz
-  const hiddenAboveHz = maxFrequencyHz - frequencyView.maxHz
-  const hiddenAbovePercent = (hiddenAboveHz / visibleSpanHz) * 100
+  const zoomedPxPerHz = spectrogramPlugin['height'] / visibleSpanHz
+  const hiddenAbovePx = (maxFrequencyHz - frequencyView.maxHz) * zoomedPxPerHz
   const canvasContainer = spectrogramPlugin['canvasContainer']
 
   spectrogramPlugin['wrapper'].style.overflow = 'hidden'
   canvasContainer.style.transformOrigin = 'top'
-  canvasContainer.style.transform = `translateY(-${hiddenAbovePercent}%) scaleY(${zoomFactor})`
+  canvasContainer.style.transform = `translateY(-${hiddenAbovePx}px) scaleY(${zoomFactor})`
 }

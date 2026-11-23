@@ -19,11 +19,11 @@ export const FrequencyLabels = ({ maxHz, stepHz, frequencyView }: FrequencyLabel
 
     return (
         <FrequencyLabelList>
-            {frequencyLabelsHz.map((frequencyHz, index) => {
-                const kHz = Number((frequencyHz / FREQUENCY_STEP).toFixed(FREQUENCY_LABEL_DECIMALS));
+            {frequencyLabelsHz.map((frequencyHz) => {
+                const hz = Number((frequencyHz / FREQUENCY_STEP).toFixed(FREQUENCY_LABEL_DECIMALS));
                 return (
-                    <FrequencyLabel key={index}>
-                        {`${kHz}k`}
+                    <FrequencyLabel key={frequencyHz}>
+                        {`${hz}k`}
                     </FrequencyLabel>
                 );
             })}

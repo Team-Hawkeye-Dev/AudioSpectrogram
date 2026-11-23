@@ -19,8 +19,11 @@ export const WavePlotWrapper = styled(Box)({
 
 export const ZoomSelectionHighlight = styled(Box)(({theme}) => ({
     position: 'absolute',
+    top: 0,
+    bottom: 0,
     backgroundColor: alpha(theme.palette.primary.main, 0.25),
-    border: `1px solid ${theme.palette.primary.main}`,
+    borderLeft: `1px solid ${theme.palette.primary.main}`,
+    borderRight: `1px solid ${theme.palette.primary.main}`,
     pointerEvents: 'none',
     zIndex: theme.zIndex.appBar
 }))

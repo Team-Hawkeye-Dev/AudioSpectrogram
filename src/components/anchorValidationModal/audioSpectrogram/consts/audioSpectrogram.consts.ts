@@ -14,8 +14,6 @@ export const SYNC_TOLERANCE_PX = 1;
 export const MAX_ZOOM_VISIBLE_SECONDS = 5;
 export const MAX_ZOOM_CANVAS_PX = 60000;
 
-export const MAX_FREQUENCY_ZOOM = 8;
-
 export const TIME_AXIS_INTERVAL_SECONDS = 5;
 export const TIME_AXIS_HEIGHT_PX = 24;
 

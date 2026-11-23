@@ -1,8 +1,10 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ZoomSelectionProps } from '../types/audioSpectrogram.types';
 import { useDragSelection } from './useDragSelection';
 import { useWheelScroll } from './useWheelScroll';
-import { useFrequencyZoom } from './useFrequencyZoom';
+import { FREQUENCY_MIN_HZ } from '../consts/audioSpectrogram.consts';
+import { applySpectrogramFrequencyView, zoomInFrequencyView, zoomOutFrequencyView } from '../utils/spectrogramActions';
+import type { FrequencyView } from '../../../../core/components/spectrogram/audioSpectrogramViewer/types';
 import { useMassiviAppStore } from '../../../../store/useStore';
 
 export const useZoomSelection = ({
@@ -27,12 +29,13 @@ export const useZoomSelection = ({
     isReadyAudio,
   });
 
-  const { frequencyView, zoomInFrequency, zoomOutFrequency, resetFrequencyView } = useFrequencyZoom({
-    spectrogramContainerRef,
-    spectrogramPluginRef,
-    isReadyAudio,
-    maxFrequencyHz,
-  });
+  const fullFrequencyView = useMemo(() => ({ minHz: FREQUENCY_MIN_HZ, maxHz: maxFrequencyHz }), [maxFrequencyHz]);
+  const [frequencyView, setFrequencyView] = useState<FrequencyView>(fullFrequencyView);
+
+  useEffect(() => {
+    const spectrogramPlugin = spectrogramPluginRef.current;
+    if (isReadyAudio && spectrogramPlugin) applySpectrogramFrequencyView(spectrogramPlugin, frequencyView, maxFrequencyHz);
+  }, [isReadyAudio, frequencyView, maxFrequencyHz, spectrogramPluginRef]);
 
   const minZoom = useMemo(() => {
     if (!initialView || !spectrogramContainer) return initialView?.minPxPerSec ?? 0;
@@ -52,14 +55,18 @@ export const useZoomSelection = ({
     onZoomOut: (minPxPerSec, scrollTime) => {
       applyZoomView({ minPxPerSec, scrollTime });
     },
-    onFrequencyZoomIn: zoomInFrequency,
-    onFrequencyZoomOut: zoomOutFrequency,
+    onFrequencyZoomIn: (selectionTopRatio, selectionBottomRatio) => {
+      setFrequencyView((view) => zoomInFrequencyView(view, selectionTopRatio, selectionBottomRatio));
+    },
+    onFrequencyZoomOut: () => {
+      setFrequencyView((view) => zoomOutFrequencyView(view, maxFrequencyHz));
+    },
   });
 
   const resetZoom = useCallback(() => {
     applyZoomView({minPxPerSec: minZoom, scrollTime: 0})
-    resetFrequencyView()
-  }, [minZoom, applyZoomView, resetFrequencyView]);
+    setFrequencyView(fullFrequencyView)
+  }, [minZoom, applyZoomView, fullFrequencyView]);
 
   return {
     selection,

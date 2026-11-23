@@ -11,7 +11,7 @@ interface UseDragSelectionProps extends SpectrogramInteractionContext {
     minZoomPxPerSec: number;
     onZoomIn: (minPxPerSec: number, scrollTime: number) => void
     onZoomOut: (minPxPerSec: number, scrollTime: number) => void
-    onFrequencyZoomIn: (selectionTopPx: number, selectionBottomPx: number) => void
+    onFrequencyZoomIn: (selectionTopRatio: number, selectionBottomRatio: number) => void
     onFrequencyZoomOut: () => void
 }
 
@@ -26,12 +26,13 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
 
     const [selection, setSelection] = useState<DragSelection | null>(null)
     const startPxRef = useRef<number | null>(null)
-    const startYPxRef = useRef<number | null>(null)
 
     const getRect = (target: HTMLElement) => target.getBoundingClientRect()
 
+    const getSpectrogramHeightPx = (target: HTMLElement) => target.clientHeight - TIME_AXIS_HEIGHT_PX
+
     const getPointerYPx = (event: PointerEvent<HTMLDivElement>) => {
-        const spectrogramHeightPx = event.currentTarget.clientHeight - TIME_AXIS_HEIGHT_PX
+        const spectrogramHeightPx = getSpectrogramHeightPx(event.currentTarget)
         const pointerYPx = event.clientY - getRect(event.currentTarget).top
         return Math.min(Math.max(pointerYPx, 0), spectrogramHeightPx)
     }
@@ -58,7 +59,6 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
         const startPx = event.clientX - getRect(event.currentTarget).left
         const startYPx = getPointerYPx(event)
         startPxRef.current = startPx
-        startYPxRef.current = startYPx
         setSelection({startPx, currentPx: startPx, startYPx, currentYPx: startYPx})
         event.currentTarget.setPointerCapture(event.pointerId)
     }
@@ -120,17 +120,15 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
 
        const waveSurfer = waveSurferInstanceRef.current
        const startPx = startPxRef.current
-       const startYPx = startYPxRef.current
        startPxRef.current = null
-       startYPxRef.current = null
        setSelection(null)
 
-       if (!waveSurfer || startPx === null || startYPx === null) return
+       if (!waveSurfer || startPx === null || !selection) return
 
        const endPx = event.clientX - getRect(event.currentTarget).left
        const endYPx = getPointerYPx(event)
        const dragPx = endPx - startPx
-       const dragYPx = endYPx - startYPx
+       const dragYPx = endYPx - selection.startYPx
        const width = spectrogramContainer.clientWidth;
 
        const isClick = Math.abs(dragPx) <= CLICK_MAX_DRAG_PX && Math.abs(dragYPx) <= CLICK_MAX_DRAG_PX
@@ -140,7 +138,7 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
         waveSurfer.setTime(seekTime)
         return
        }
-       if (isFrequencySelection({ startPx, currentPx: endPx, startYPx, currentYPx: endYPx })) {
+       if (isFrequencySelection({ ...selection, currentPx: endPx, currentYPx: endYPx })) {
         if (dragYPx < 0) {
             onFrequencyZoomOut()
             return
@@ -151,7 +149,8 @@ spectrogramPlotType, spectrogramContainerRef, waveSurferInstanceRef, isReadyAudi
             })
             return
         }
-        onFrequencyZoomIn(startYPx, endYPx)
+        const spectrogramHeightPx = getSpectrogramHeightPx(spectrogramContainer)
+        onFrequencyZoomIn(selection.startYPx / spectrogramHeightPx, endYPx / spectrogramHeightPx)
         return
        }
        if (dragPx < 0) {
